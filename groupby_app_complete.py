@@ -3,7 +3,7 @@ import streamlit as st
 st.title = ("Groupby analysis")
 uploaded_file = st.file_uploader("Upload your file", type = ["xlsx", "xls"])
 if uploaded_file is not None:
-    df = pd.read_excel(uploaded_file,  header=1)
+    df = pd.read_excel(uploaded_file)
     st.success("File loaded successfully")
     #Preview of the data we have loaded
     st.subheader("Data Preview")
