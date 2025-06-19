@@ -34,4 +34,4 @@ if uploaded_file is not None:
     else:
         st.info("Please select at least one numeric column to aggregate.")
 else:
-    st.info("Please upload your file to begin")
+    st.info("Please upload your file to begin.")
