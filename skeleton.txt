@@ -1,0 +1,120 @@
+import streamlit as st
+import pandas as pd
+
+st.title("📊 Excel Data Analysis Tool")
+
+# File uploaders
+st.subheader("📂 Upload Your Excel File(s)")
+file1 = st.file_uploader("Upload File 1", type=["xlsx", "xls"], key="file1")
+file2 = st.file_uploader("Upload File 2 (optional)", type=["xlsx", "xls"], key="file2")
+
+df1, df2 = None, None
+
+# Load files
+if file1:
+    df1 = pd.read_excel(file1)
+    st.success("✅ File 1 loaded")
+    st.write(df1.head())
+
+if file2:
+    df2 = pd.read_excel(file2)
+    st.success("✅ File 2 loaded")
+    st.write(df2.head())
+
+# If two files are uploaded, show merge options
+if df1 is not None and df2 is not None:
+    st.subheader("🔗 Merge Datasets")
+    
+    common_cols = list(set(df1.columns) & set(df2.columns))
+    
+    if common_cols:
+        merge_col = st.selectbox("Select a column to merge on", common_cols)
+        how = st.selectbox("Select merge type", ["inner", "left", "right", "outer"])
+
+        if st.button("Merge Files"):
+            merged_df = pd.merge(df1, df2, on=merge_col, how=how)
+            st.success("✅ Files merged successfully!")
+            st.write(merged_df.head())
+            df1 = merged_df  # Replace df1 with merged result for further analysis
+    else:
+        st.warning("⚠️ No common columns to merge on!")
+
+# Analysis Section
+if df1 is not None:
+    st.subheader("📈 Data Analysis Options")
+
+    analysis = st.selectbox("Choose an analysis type", ["Summary Stats", "Group By", "Missing Values", "Data Types"])
+
+    if analysis == "Summary Stats":
+        st.write(df1.describe(include='all'))
+
+    elif analysis == "Group By":
+        group_col = st.selectbox("Select a column to group by", df1.columns)
+        agg_func = st.selectbox("Aggregation function", ["mean", "sum", "count", "min", "max"])
+        grouped = df1.groupby(group_col).agg(agg_func)
+        st.write(grouped)
+
+    elif analysis == "Missing Values":
+        st.write(df1.isnull().sum())
+
+    elif analysis == "Data Types":
+        st.write(df1.dtypes)
+
+                 19/6/2025
+                 #Dealing with Null
+# Tabs for separation
+    tab1, tab2 = st.tabs(["🚫 Drop Nulls", "🛠 Replace Nulls"])
+
+    with tab1:
+        st.subheader("🚫 Drop Rows with Nulls")
+        drop_cols = st.multiselect("Select columns to DROP rows with missing values:", df1.columns.tolist())
+
+        if drop_cols:
+            before = df1.shape[0]
+            df1 = df1.dropna(subset=drop_cols)
+            after = df1.shape[0]
+            st.warning(f"⚠️ {before - after} rows dropped due to nulls in selected columns.")
+with tab2:
+    st.subheader("🛠 Replace Missing Values")
+
+    replace_cols = st.multiselect(
+        "Select columns to REPLACE missing values:",
+        df1.columns.difference(drop_cols)
+    )
+
+    if replace_cols:
+        strategy = st.selectbox(
+            "Choose replacement strategy:",
+            ["Replace with 0", "Replace with Custom Text", "Replace with Mean", "Replace with Median", "Replace with Mode"]
+        )
+
+        if strategy == "Replace with 0":
+            df1[replace_cols] = df1[replace_cols].fillna(0)
+            st.success(f"✅ Replaced nulls in {replace_cols} with 0.")
+
+        elif strategy == "Replace with Custom Text":
+            custom_value = st.text_input("Enter the custom value to use:")
+            if custom_value:
+                df1[replace_cols] = df1[replace_cols].fillna(custom_value)
+                st.success(f"✅ Replaced nulls in {replace_cols} with '{custom_value}'.")
+
+        elif strategy in ["Replace with Mean", "Replace with Median", "Replace with Mode"]:
+            skipped = []
+            for col in replace_cols:
+                if pd.api.types.is_numeric_dtype(df1[col]):
+                    if strategy == "Replace with Mean":
+                        value = df1[col].mean()
+                    elif strategy == "Replace with Median":
+                        value = df1[col].median()
+                    elif strategy == "Replace with Mode":
+                        value = df1[col].mode()[0] if not df1[col].mode().empty else None
+
+                    if value is not None:
+                        df1[col] = df1[col].fillna(value)
+                else:
+                    skipped.append(col)
+
+            if skipped:
+                st.warning(f"⚠️ Skipped non-numeric columns: {', '.join(skipped)}")
+            else:
+                st.success(f"✅ Replaced nulls with {strategy.split()[-1].lower()} values in selected numeric columns.")

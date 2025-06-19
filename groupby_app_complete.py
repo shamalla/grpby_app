@@ -31,5 +31,7 @@ if uploaded_file is not None:
         grouped_df = df.groupby(group_column)[selected_cols].agg(agg_function)
         st.subheader("Grouped Result")
         st.dataframe(grouped_df)
+    else:
+        st.info("Please select at least one numeric column to aggregate.")
 else:
-    st.info("Please select at least one numeric column to aggregate.")
+    st.info("Please upload your file to begin")
