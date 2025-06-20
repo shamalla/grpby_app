@@ -4,14 +4,22 @@ import matplotlib.pyplot as plt
 import streamlit as st
 st.title = ("Total Analysis")
 st.subheader("Upload your file(s)")
-file1 = st.file_uploader("Upload file 1", type = ["xlsx","xlx","txt","csv"])
-file2 = st.file_uploader("Uploade your file (optional)", type = ["xlsx","xlx","txt","csv"])
-dfi , df2 = None, None
+file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","txt","csv"], key = "file1")
+file2 = st.file_uploader("Uploade your file (optional)", type = ["xlsx","xlx","txt","csv"], key = "file2")
+df1 , df2 = None, None
 
 #Loaded files
 if file1 :
-    df1 = pd.read_excel(file1)
+    df1 = pd.read_excel(file1) if file1.name.endswith["xlsx", "xls"] else pd.read_csv(file1)
+if file2:
+    df2 = pd.read_excel(file2) if file.name.endswith["xlsx", "xls"] else pd.read_csv(file2)
+if df1 is not None:
     st.success("file 1 has been loaded successfully")
+    analysis_option = ["Analyze file 1 only"]
+    if df2 is not None:
+        st.success("file 2 has been loaded successfully")
+        analysis_option.extend(["Analyze file 2 only", "Analyze file 1 and file 2 separetly", "Merge file 1 and file 2, then analyze "])
+
     #preview of the data we have loaded
     st.subheader("File 1 preview")
     num_rows1 = st.slider("Select number of rows to preview", min_value = 5, max_value = 100, value = 10 )
@@ -89,15 +97,18 @@ if file1 :
     #Select only numeric columns
     numeric_cols1 = df1.select_dtype(include = "number").columns
     if len(numeric_cols1) == 0:
-        st.warning("No numeric columns available")
+        st.warning("No numeric columns available for aggregation.")
     elif grpby_col1:
         selected_cols1 = st.multiselect("Select numeric columns to aggregate", numeric_cols1, default = (numeric_cols1))
-    if selected_cols1:
-        grouped_df1 = df1.groupby(grpby_col1)[selected_cols1].agg(aggf1)
-        st.subheader("Grouped Result")
-        st.dataframe(grouped_df1)
+    if selected_cols1 and aggf1:
+        try:
+            grouped_df1 = df1.groupby(grpby_col1)[selected_cols1].agg(aggf1)
+            st.subheader("Grouped Result")
+            st.dataframe(grouped_df1)
+        except Exception as e:
+            st.error(f"Error while grouping: {e}")
     else:
-        st.info("Please select at least one numeric column to aggregate")
+        st.info("Please select at least one numeric column and one aggregate function to aggregate")
 else:
     st.info("Please load your data to begin.")
 
@@ -173,22 +184,25 @@ if file2:
         st.dataframe(df2.head(10))
     #Group by function
     st.subheader("Group by statistics")
-    grpby_col1 = st.multiselect("Select column(s) to group by", df1.columns)
-    aggf1 = st.multiselect("Select aggregatation function",["mean", "sum", "count","min", "max"])
+    grpby_col2 = st.multiselect("Select column(s) to group by", df2.columns)
+    aggf2 = st.multiselect("Select aggregatation function",["mean", "sum", "count","min", "max"])
     #Select only numeric columns
-    numeric_cols1 = df1.select_dtype(include = "number").columns
-    if len(numeric_cols1) == 0:
-        st.warning("No numeric columns available")
-    elif grpby_col1:
-        selected_cols1 = st.multiselect("Select numeric columns to aggregate", numeric_cols1, default = (numeric_cols1))
-    if selected_cols1:
-        grouped_df1 = df1.groupby(grpby_col1)[selected_cols1].agg(aggf1)
-        st.subheader("Grouped Result")
-        st.dataframe(grouped_df1)
+    numeric_cols2 = df2.select_dtype(include = "number").columns
+    if len(numeric_cols2) == 0:
+        st.warning("No numeric columns available for aggregation")
+    elif grpby_col2:
+        selected_cols2 = st.multiselect("Select numeric columns to aggregate", numeric_cols2, default = (numeric_cols2))
+    if selected_cols2 and aggf2:
+        try:
+            grouped_df2 = df2.groupby(grpby_col2)[selected_cols2].agg(aggf2)
+            st.subheader("Grouped Result")
+            st.dataframe(grouped_df2)
+        except Exception as e1:
+            st.error(f"error while grouping: {e1}")
     else:
-        st.info("Please select at least one numeric column to aggregate")
+        st.info("Please select at least one numeric column and one ggregate function to aggregate")
 else:
-    st.info("Please load your data to begin.")
+    st.info("Please load your second data to begin.")
 
     
     
