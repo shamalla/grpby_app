@@ -123,7 +123,7 @@ if df1 is not None:
                 st.error(f"Merge faile: {e}")
             
 else:
-    st.info("Please load your second data to begin.")
+    st.info("Please load your data to begin.")
 
 
 
