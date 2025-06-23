@@ -108,19 +108,19 @@ if df1 is not None:
             right_only = merged_df[merged_df["_merge"] == "right_only"]
 
             with st.expander("Rows from both files"):
-                st.write(f"Shape:{both_files}")
+                st.write(f"Shape:{both_files.shape}")
                 st.dataframe(both_files.head())
                 with st.expander("Summary of Both rows"):
                     st.write(both_files.describe(include = "all"))
                 
             with st.expander("Rows from File 1 only"):
-                st.write(f"Shape:{left_only}")
+                st.write(f"Shape:{left_only.shape}")
                 st.dataframe(left_only.head())
                 with st.expander("Summary of files from File 1"):
                     st.write(left_only.describe(include = "all"))
 
             with st.expander("Rows from File 2 only"):
-                st.write(f"Shape:{right_only}")
+                st.write(f"Shape:{right_only.shape}")
                 st.dataframe(right_only.head())
                 with st.expander("Summary of files from File 2"):
                     st.write(right_only.describe(include = "all"))
