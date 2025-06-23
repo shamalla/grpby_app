@@ -14,12 +14,12 @@ df1 , df2 = None, None
 if file1 :
     xls = pd.ExcelFile(file1)
     sheet_names = xls.sheet_names
-    selected_sheet = st.selectbox("Select sheet to analyze", sheet_names, key = "f1")
+    selected_sheet = st.selectbox("Select sheet to analyze for File 1", sheet_names, key = "f1")
     df1 = pd.read_excel(file1, sheet_name=selected_sheet) if file1.name.endswith("xlsx") else pd.read_csv(file1)
     st.success(f"Loaded: {selected_sheet}")
 if file2:
     xls = pd.ExcelFile(file2)
-    sheet_names = st.selectbox("Select sheet to analyze", sheet_names,key = "f2")
+    sheet_names = st.selectbox("Select sheet to analyze for File 2", sheet_names,key = "f2")
     df2 = pd.read_excel(file2, sheet_name=selected_sheet) if file2.name.endswith("xlsx") else pd.read_csv(file2)
     st.success(f"Loaded: {selected_sheet}")
 
