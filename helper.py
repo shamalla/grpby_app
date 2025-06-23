@@ -84,7 +84,7 @@ def analyze_file(df,label = "File"):
         st.warning(f"No numeric columns available for aggregation in {label}.")
     elif grpby_col:
         selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols))
-    if selected_cols and aggf:
+    if selected_cols and aggf and grpby_col:
         try:
             grouped_df = df.groupby(grpby_col)[selected_cols].agg(aggf)
             st.subheader("Grouped Result")
