@@ -1,4 +1,4 @@
-def analyze_file(df,label = {label = "File"}):
+def analyze_file(df,label = "File"):
     st.subheader(f"{label} preview")
     num_rows1 = st.slider(f"Select number of rows to preview - {label}", min_value = 5, max_value = 100, value = 10 )
     st.dataframe(df.head(num_rows))

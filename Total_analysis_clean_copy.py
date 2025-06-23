@@ -12,11 +12,16 @@ df1 , df2 = None, None
 
 #Loaded files
 if file1 :
-    df1 = pd.read_excel(file1) if file1.name.endswith["xlsx", "xls"] else pd.read_csv(file1)
-    st.success("File 1 has been loaded successfully")
+    xls = pd.ExcelFile(file1)
+    sheet_names = xls.sheet_names
+    selected_sheet = st.selectbox("Select sheet to analyze", sheet_names)
+    df1 = pd.read_excel(file1, sheet_name=selected_sheet) if file1.name.endswith("xlsx") else pd.read_csv(file1)
+    st.success(f"Loaded: {selected_sheet}")
 if file2:
-    df2 = pd.read_excel(file2) if file.name.endswith["xlsx", "xls"] else pd.read_csv(file2)
-    st.success("File 2 has been loaded sucessfully")
+    xls = pd.ExcelFile(file2)
+    sheet_names = st.selectbox("Select sheet to analyze", sheet_names)
+    df2 = pd.read_excel(file2, sheet_name=selected_sheet) if file2.name.endswith("xlsx") else pd.read_csv(file2)
+    st.success(f"Loaded: {selected_sheet}")
 
 if df1 is not None:
     options = ["Analyze File 1 only"]
