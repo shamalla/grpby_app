@@ -1,3 +1,8 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import streamlit as st
+
 def analyze_file(df,label = "File"):
     st.subheader(f"{label} preview")
     num_rows1 = st.slider(f"Select number of rows to preview - {label}", min_value = 5, max_value = 100, value = 10 )
