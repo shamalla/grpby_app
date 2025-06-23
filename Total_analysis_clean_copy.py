@@ -112,6 +112,27 @@ if df1 is not None:
                 st.dataframe(both_files.head())
                 with st.expander("Summary of Both rows"):
                     st.write(both_files.describe(include = "all"))
+                with st.expander("Add or subtract Two numeric columns"):
+                    numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
+                    
+                    if len(numeric_columns) < 2:
+                        st.warning("Need atleast two numeric columns to add or subtract.")
+
+                    else:
+                        col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
+                        col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
+                        operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
+
+                        if col1 and col2:
+                            if operation == "Add":
+                                both_files["Result"] = both_files[col1] + both_files[col2]
+                                st.success(f"{col1} + {col2}")
+                            else:
+                                both_files["Result"] = both_files[col1] - both_files[col2]
+                                st.success(f"{col1} - {col2}")
+
+                            with st.expander("Preview of Result"):
+                                st.dataframe(both_files[[col1, col2, "Result"]].head(10))
                 
             with st.expander("Rows from File 1 only"):
                 st.write(f"Shape:{left_only.shape}")
