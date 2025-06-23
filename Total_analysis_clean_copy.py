@@ -45,27 +45,28 @@ if df1 is not None:
             #Drop duplicates if user wants
             st.markdown("***Remove duplicates**")
             if st.checkbox("Drop duplicates in File 1"):
-                before = df1.shape[]
+                before = df1.shape[0]
                 df1 = df1.drop_duplicates()
-                after = df1.shape[]
+                after = df1.shape[0]
                 st.success(f"{befor - after} duplicate rows removed from File 1.")
             if st.checkbox("Drop duplicates in File2"):
-                before = df2.shape[]
+                before = df2.shape[0]
                 df2 = df2.drop_duplicates()
-                after = df2.shape[]
+                after = df2.shape[0]
                 st.success(f"{before - after} duplicate rows romeved in File 2.")
             #Drop rows with null values
             st.markdown("**Drop rows with null values**")
             cols1 = st.multiselect("Drop rows in File 1 with null in selected columns:",df1.columns.tolist(),key = "dropna1")
             if cols1:
-                before = df1.shape[]
+                before = df1.shape[0]
                 df1 = df1.dropna(subset = cols1)
-                after = df2.shape[]
-                st.warning(f"{before - after} rows droped frop File 1 due to nulls.")
+                after = df1.shape[0]
+                st.warning(f"{before - after} rows droped from File 1 due to nulls.")
             cols2 = st.multiselect("Drop rows in File 2 with null in selected columns:", df2.columns.tolist(),key ="dropna2")
             if cols2:
-                before = df1.shape[]
+                before = df2.shape[0]
                 df2 = df2.dropna(subset = cols2)
+                after = df2.shape[0]
                 st.warning(f"{before - after} rows droped from File 2 due to nulls.")
             
             st.subheader("Merging analysis")
