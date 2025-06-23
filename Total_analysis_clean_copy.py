@@ -22,7 +22,6 @@ if file2:
     sheet_names = st.selectbox("Select sheet to analyze for File 2", sheet_names,key = "f2")
     df2 = pd.read_excel(file2, sheet_name=selected_sheet) if file2.name.endswith("xlsx") else pd.read_csv(file2)
     st.success(f"Loaded: {selected_sheet}")
-
 if df1 is not None:
     options = ["Analyze File 1 only"]
     if df2 is not None:
