@@ -53,7 +53,7 @@ if df1 is not None:
             before = df1.shape[0]
             df1 = df1.drop_duplicates()
             after = df1.shape[0]
-            st.success(f"{befor - after} duplicate rows removed from File 1.")
+            st.success(f"{before - after} duplicate rows removed from File 1.")
         if st.checkbox("Drop duplicates in File2"):
             before = df2.shape[0]
             df2 = df2.drop_duplicates()
