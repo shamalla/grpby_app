@@ -15,7 +15,7 @@ if file1 :
     xls1 = pd.ExcelFile(file1)
     sheet_names1 = xls1.sheet_names
     selected_sheet1 = st.selectbox("Select sheet to analyze for File 1", sheet_names1, key = "f1")
-    df1 = pd.read_excel(file1, sheet_names=selected_sheet1) if file1.name.endswith("xlsx") else pd.read_csv(file1)
+    df1 = pd.read_excel(file1, sheet_name=selected_sheet1) if file1.name.endswith("xlsx") else pd.read_csv(file1)
     st.success(f"Loaded: {selected_sheet1} from File 1")
 if file2:
     xls2 = pd.ExcelFile(file2)
