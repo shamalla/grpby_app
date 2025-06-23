@@ -79,6 +79,7 @@ def analyze_file(df,label = "File"):
     aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"])
     #Select only numeric columns
     numeric_cols = df.select_dtypes(include = "number").columns
+    selected_cols = []
     if len(numeric_cols) == 0:
         st.warning(f"No numeric columns available for aggregation in {label}.")
     elif grpby_col:
