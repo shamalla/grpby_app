@@ -94,69 +94,73 @@ if df1 is not None:
                 cols_df2.append(merge_col_df2)
             df1_subset = df1[cols_df1]
             df2_subset = df2[cols_df2]
-
-            df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
-            df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
-
-            common_cols = set(df1_subset.columns) & set(df2_subset.columns)
-            if common_cols:
-                st.error(f"Merge failed: Still found duplicate columns: {list(common_cols)}")
         else:
             df1_subset = df1
             df2_subset = df2
-        #perform the merge function
-        try:
-            merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
-            st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
-            st.dataframe(merged_df.head(10))
 
-            both_files = merged_df[merged_df["_merge"] == "both"]
-            left_only = merged_df[merged_df["_merge"] == "left_only"]
-            right_only = merged_df[merged_df["_merge"] == "right_only"]
+        df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
+        df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
 
-            with st.expander("Rows from both files"):
-                st.write(f"Shape:{both_files.shape}")
-                st.dataframe(both_files.head())
-                with st.expander("Summary of Both rows"):
-                    st.write(both_files.describe(include = "all"))
-                with st.expander("Add or subtract Two numeric columns"):
-                    numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
+        common_cols = set(df1_subset.columns) & set(df2_subset.columns)
+        if common_cols:
+            st.error(f" Merge failed: Still found duplicate columns: {list(common_cols)}")
+        else:
+            #perform the merge function
+            try:
+                merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
+                st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
+                st.dataframe(merged_df.head(10))
+
+                both_files = merged_df[merged_df["_merge"] == "both"]
+                left_only = merged_df[merged_df["_merge"] == "left_only"]
+                right_only = merged_df[merged_df["_merge"] == "right_only"]
+
+                #Rows from all the tables
+                with st.expander("Rows from both files"):
+                    st.write(f"Shape:{both_files.shape}")
+                    st.dataframe(both_files.head())
+                    with st.expander("Summary of Both rows"):
+                        st.write(both_files.describe(include = "all"))
+                    with st.expander("Add or subtract Two numeric columns"):
+                        numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
                     
-                    if len(numeric_columns) < 2:
-                        st.warning("Need atleast two numeric columns to add or subtract.")
+                        if len(numeric_columns) < 2:
+                            st.warning("Need atleast two numeric columns to add or subtract.")
 
-                    else:
-                        col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
-                        col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
-                        operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
+                        else:
+                            col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
+                            col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
+                            operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
-                        if col1 and col2:
-                            if "Result" in both_files.columns:
-                                both_files.drop(columns =["Result"], inplace=True)
-                            if operation == "Add":
-                                both_files["Result"] = both_files[col1] + both_files[col2]
-                                st.success(f"{col1} + {col2}")
-                            else:
-                                both_files["Result"] = both_files[col1] - both_files[col2]
-                                st.success(f"{col1} - {col2}")
+                            if col1 and col2:
+                                if "Result" in both_files.columns:
+                                    both_files.drop(columns =["Result"], inplace=True)
+                                if operation == "Add":
+                                    both_files["Result"] = both_files[col1] + both_files[col2]
+                                    st.success(f"{col1} + {col2}")
+                                else:
+                                    both_files["Result"] = both_files[col1] - both_files[col2]
+                                    st.success(f"{col1} - {col2}")
 
-                            with st.expander("Preview of Result"):
-                                st.dataframe(both_files[[col1, col2, "Result"]].head(10))
+                                with st.expander("Preview of Result"):
+                                    st.dataframe(both_files[[col1, col2, "Result"]].head(10))
                 
-            with st.expander("Rows from File 1 only"):
-                st.write(f"Shape:{left_only.shape}")
-                st.dataframe(left_only.head())
-                with st.expander("Summary of files from File 1"):
-                    st.write(left_only.describe(include = "all"))
+                #Rows from Left table only
+                with st.expander("Rows from File 1 only"):
+                    st.write(f"Shape:{left_only.shape}")
+                    st.dataframe(left_only.head())
+                    with st.expander("Summary of files from File 1"):
+                        st.write(left_only.describe(include = "all"))
 
-            with st.expander("Rows from File 2 only"):
-                st.write(f"Shape:{right_only.shape}")
-                st.dataframe(right_only.head())
-                with st.expander("Summary of files from File 2"):
-                    st.write(right_only.describe(include = "all"))
+                #Rows from right Table only
+                with st.expander("Rows from File 2 only"):
+                    st.write(f"Shape:{right_only.shape}")
+                    st.dataframe(right_only.head())
+                    with st.expander("Summary of files from File 2"):
+                        st.write(right_only.describe(include = "all"))
 
-        except Exception as e:
-            st.error(f"Merger failed: {e}")
+            except Exception as e:
+                st.error(f"Merger failed: {e}")
             
 else:
     st.info("Please load your data to begin.")
