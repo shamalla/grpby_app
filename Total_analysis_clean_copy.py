@@ -108,7 +108,7 @@ if df1 is not None:
                     final_cols.append(col)
                 else:
                     final_cols.append(f"{col}_{suffix}")
-            df.columns = new_columns
+            df.columns = final_cols
             return df
 
 
