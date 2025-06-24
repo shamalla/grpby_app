@@ -124,6 +124,8 @@ if df1 is not None:
                         operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
                         if col1 and col2:
+                            if "Result" in both_files.columns:
+                                both_files.drop(columns =["Result"], inplace=True)
                             if operation == "Add":
                                 both_files["Result"] = both_files[col1] + both_files[col2]
                                 st.success(f"{col1} + {col2}")
@@ -147,7 +149,7 @@ if df1 is not None:
                     st.write(right_only.describe(include = "all"))
 
         except Exception as e:
-            st.error(f"Merger faileed: {e}")
+            st.error(f"Merger failed: {e}")
             
 else:
     st.info("Please load your data to begin.")
