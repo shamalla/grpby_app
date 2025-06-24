@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from helper import analyze_file
 
 st.title = ("Total Analytics")
-st.subheader("Upload your file(s)")
+st.subheader(f"Welcome.Bienvenue... Please upload your file(s).")
 file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","csv"], key = "file1")
 file2 = st.file_uploader("Upload your file (optional)", type = ["xlsx","xlx","csv"], key = "file2")
 df1 , df2 = None, None
@@ -95,8 +95,8 @@ if df1 is not None:
             df1_subset = df1[cols_df1]
             df2_subset = df2[cols_df2]
 
-            df1_subset.columns = [f"{col}_f1" if col != merge_col_df1 else col for col in df1_subset.columns]
-            df2_subset.columns = [f"{col}_f2" if col != merge_col_df2 else col for col in df2_subset.columns]
+            df1_subset.columns = [f"{col}_fl1" if col != merge_col_df1 else col for col in df1_subset.columns]
+            df2_subset.columns = [f"{col}_fl2" if col != merge_col_df2 else col for col in df2_subset.columns]
         else:
             df1_subset = df1
             df2_subset = df2
