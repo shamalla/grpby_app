@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from helper import analyze_file
 
 st.title = ("Total Analytics")
-st.subheader(f"Welcome.Bienvenue... Please upload your file(s).")
+st.subheader(f"Karibu. Welcome. Bienvenue... Please upload your file(s).")
 file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","csv"], key = "file1")
 file2 = st.file_uploader("Upload your file (optional)", type = ["xlsx","xlx","csv"], key = "file2")
 df1 , df2 = None, None
@@ -92,8 +92,8 @@ if df1 is not None:
                 cols_df1.append(merge_col_df1)
             if merge_col_df2 not in cols_df2:
                 cols_df2.append(merge_col_df2)
-            df1_subset = df1[cols_df1]
-            df2_subset = df2[cols_df2]
+            df1_subset = df1[cols_df1].copy()
+            df2_subset = df2[cols_df2].copy()
 
             #Add suffixex to prevent duplicates
             df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
@@ -101,8 +101,8 @@ if df1 is not None:
 
 
         else:
-            df1_subset = df1
-            df2_subset = df2
+            df1_subset = df1.copy()
+            df2_subset = df2.copy()
 
             df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
             df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
