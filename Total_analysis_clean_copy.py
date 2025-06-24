@@ -83,25 +83,33 @@ if df1 is not None:
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
         #To input a function that now removes duplicate by inputing a suffix 
         def safe_rename_columns(df, merge_col,suffix):
-            if df.columns.duplicated().any():
-                duplicates = df.columns[df.columns.duplicated()].tolist()
-                raise ValueError(f"Original DataFrame has duplicate columns: {duplicates}")
-            new_columns = []
-            seen = set()
-            for col in df.columns:
-                if col == merge_col:
-                    new_col = col
+            cols = df.columns.tolist()
+            seen = {}
+            new_base_cols = []
+            for col in cols:
+                if col not in seen:
+                    seen[col] = 1
+                    new_base_cols.append(col)
                 else:
-                    base_col = f"{col}_{suffix}"
-                    new_col = base_col
-                    i = 1
-                    while new_col in seen:
-                        new_col = f"{base_col}_{i}"
-                        i += 1
-                seen.add(new_col)
-                new_columns.append(new_col)
-            df.columns = new_columns
-            return df
+                    count = seen[col]
+                    new_name = f"{col}_{count}"
+                    while new_name in seen:
+                        count += 1
+                        new_name = f"{col}_{count}"
+                    seen[col] = count + 1
+                    seen[new_name] = 1
+                    new_base_cols.append(new_name)
+                df.columns = new_base_cols
+
+            # Step 2: Add suffix except for merge column
+                final_cols = []
+                for col in df.columns:
+                    if col == merge_col:
+                        final_cols.append(col)
+                    else:
+                        final_cols.append(f"{col}_{suffix}")
+                df.columns = new_columns
+                return df
 
 
         #Columns to be included in our merge
