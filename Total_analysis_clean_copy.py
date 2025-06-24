@@ -99,17 +99,17 @@ if df1 is not None:
                     seen[col] = count + 1
                     seen[new_name] = 1
                     new_base_cols.append(new_name)
-                df.columns = new_base_cols
+            df.columns = new_base_cols
 
             # Step 2: Add suffix except for merge column
-                final_cols = []
-                for col in df.columns:
-                    if col == merge_col:
-                        final_cols.append(col)
-                    else:
-                        final_cols.append(f"{col}_{suffix}")
-                df.columns = new_columns
-                return df
+            final_cols = []
+            for col in df.columns:
+                if col == merge_col:
+                    final_cols.append(col)
+                else:
+                    final_cols.append(f"{col}_{suffix}")
+            df.columns = new_columns
+            return df
 
 
         #Columns to be included in our merge
