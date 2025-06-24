@@ -96,7 +96,7 @@ if df1 is not None:
                         new_columns.append(new_col)
                         seen.add(new_col)
                 if len(new_columns) != len(df.columns):
-                    raise ValueError("Column renaming mismatch: expected {len(df.columns)} columns, got {len(new_columns)}")
+                    raise ValueError(f"Column renaming mismatch: expected {len(df.columns)} columns, got {len(new_columns)}")
                 st.write("Original columns:", df.columns.tolist())
                 st.write("New columns:", new_columns)
                 df.columns = new_columns
