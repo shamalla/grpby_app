@@ -94,6 +94,9 @@ if df1 is not None:
                 cols_df2.append(merge_col_df2)
             df1_subset = df1[cols_df1]
             df2_subset = df2[cols_df2]
+
+            df1_subset.columns = [f"{col}_f1" if col != merge_col_df1 else col for col in df1_subset.columns]
+            df2_subset.columns = [f"{col}_f2" if col != merge_col_df2 else col for col in df2_subset.columns]
         else:
             df1_subset = df1
             df2_subset = df2
