@@ -99,7 +99,7 @@ if df1 is not None:
             df2_subset = df2
         #perform the merge function
         try:
-            merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_file1', '_file2'),indicator=True)
+            merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
             st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
             st.dataframe(merged_df.head(10))
 
@@ -147,7 +147,7 @@ if df1 is not None:
                     st.write(right_only.describe(include = "all"))
 
         except Exception as e:
-            st.error(f"Merge faile: {e}")
+            st.error(f"Merger faileed: {e}")
             
 else:
     st.info("Please load your data to begin.")
