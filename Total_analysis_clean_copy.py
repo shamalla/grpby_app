@@ -83,22 +83,23 @@ if df1 is not None:
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
         #To input a function that now removes duplicate by inputing a suffix 
         def safe_rename_columns(df, merge_col,suffix):
+            if df.columns.duplicated().any():
+                duplicates = df.columns[df.columns.duplicated()].tolist()
+                raise ValueError(f"Original DataFrame has duplicate columns: {duplicates}")
             new_columns = []
             seen = set()
             for col in df.columns:
                 if col == merge_col:
                     new_col = col
                 else:
-                    new_col = f"{col}_{suffix}"
-                    # Ensure column name is unique
+                    base_col = f"{col}_{suffix}"
+                    new_col = base_col
+                    i = 1
                     while new_col in seen:
-                        new_col += "_dup"
+                        new_col = f"{base_col}_{i}"
+                        i += 1
                 seen.add(new_col)
                 new_columns.append(new_col)
-            if len(new_columns) != len(df.columns):
-                raise ValueError(f"Column renaming mismatch: expected {len(df.columns)} columns, got {len(new_columns)}")
-                st.write("Original columns:", df.columns.tolist())
-                st.write("New columns:", new_columns)
             df.columns = new_columns
             return df
 
