@@ -93,8 +93,8 @@ if df1 is not None:
                     # Ensure column name is unique
                     while new_col in seen:
                         new_col += "_dup"
-                        new_columns.append(new_col)
-                        seen.add(new_col)
+                new_columns.append(new_col)
+                seen.add(new_col)
                 if len(new_columns) != len(df.columns):
                     raise ValueError(f"Column renaming mismatch: expected {len(df.columns)} columns, got {len(new_columns)}")
                 st.write("Original columns:", df.columns.tolist())
