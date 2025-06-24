@@ -81,6 +81,10 @@ if df1 is not None:
 
         #How do you want to merge your data
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
+        #To input a function that now removes duplicate by inputing a suffix 
+        def safe_rename_columns(df, merge_key,suffix):
+            return{col: col if col == merge_key else f"{col}_{suffix}" for col in df.columns}
+
 
         #Columns to be included in our merge
         cols_inc = st.radio("Columns to include in the merge analysis",["Use all colums","Select specific_columns"])
@@ -95,17 +99,12 @@ if df1 is not None:
             df1_subset = df1[cols_df1].copy()
             df2_subset = df2[cols_df2].copy()
 
-            #Add suffixex to prevent duplicates
-            df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
-            df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
-
-
         else:
             df1_subset = df1.copy()
             df2_subset = df2.copy()
 
-            df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
-            df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
+        df1_subset.rename(columns=safe_rename_columns(df1_subset, merge_col_df1, "fl1"), inplace=True)
+        df2_subset.rename(columns=safe_rename_columns(df2_subset, merge_col_df2, "fl2"), inplace=True)
 
         common_cols = set(df1_subset.columns) & set(df2_subset.columns)
         if common_cols:
