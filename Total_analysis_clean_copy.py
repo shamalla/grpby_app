@@ -82,8 +82,18 @@ if df1 is not None:
         #How do you want to merge your data
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
         #To input a function that now removes duplicate by inputing a suffix 
-        def safe_rename_columns(df, merge_key,suffix):
-            return{col: col if col == merge_key else f"{col}_{suffix}" for col in df.columns}
+        def safe_rename_columns(df, merge_col,suffix):
+            renamed_cols = []
+            seen = set()
+            for col in df.columns:
+                new_col = col if col == merge_col else f"{col}_{suffix}"
+                # Ensure uniqueness
+                while new_col in seen:
+                    new_col += "_dup"
+                    renamed_cols.append(new_col)
+                    seen.add(new_col)
+                df.columns = renamed_cols
+                return df
 
 
         #Columns to be included in our merge
@@ -103,8 +113,8 @@ if df1 is not None:
             df1_subset = df1.copy()
             df2_subset = df2.copy()
 
-        df1_subset.rename(columns=safe_rename_columns(df1_subset, merge_col_df1, "fl1"), inplace=True)
-        df2_subset.rename(columns=safe_rename_columns(df2_subset, merge_col_df2, "fl2"), inplace=True)
+        df1_subset = safe_rename_columns(df1_subset, merge_col_df1, "fl1")
+        df2_subset = safe_rename_columns(df2_subset, merge_col_df2, "fl2")
 
         common_cols = set(df1_subset.columns) & set(df2_subset.columns)
         if common_cols:
