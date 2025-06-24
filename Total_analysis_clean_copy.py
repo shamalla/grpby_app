@@ -94,12 +94,18 @@ if df1 is not None:
                 cols_df2.append(merge_col_df2)
             df1_subset = df1[cols_df1]
             df2_subset = df2[cols_df2]
+
+            #Add suffixex to prevent duplicates
+            df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
+            df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
+
+
         else:
             df1_subset = df1
             df2_subset = df2
 
-        df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
-        df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
+            df1_subset.columns = [col if col == merge_col_df1 else f"{col}_fl1" for col in df1_subset.columns]
+            df2_subset.columns = [col if col == merge_col_df2 else f"{col}_fl2" for col in df2_subset.columns]
 
         common_cols = set(df1_subset.columns) & set(df2_subset.columns)
         if common_cols:
