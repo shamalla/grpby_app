@@ -176,8 +176,8 @@ if df1 is not None:
                                         result_df["Result"] = result_df[col1] - result_df[col2]
                                         st.success(f"Computed:{col1} - {col2}")
 
-                                    with st.expander("Preview of Result"):
-                                        st.dataframe(result_df[[col1, col2, "Result"]].head(10))
+                                        with st.expander("Preview of Result"):
+                                            st.dataframe(result_df[[col1, col2, "Result"]].head(10))
                 
                 #Rows from Left table only
                 with st.expander("Rows from File 1 only"):
