@@ -166,7 +166,7 @@ if df1 is not None:
                             operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
                             result_df = both_files[[col1, col2]].copy()
-                            if col1 and col2:
+                            if col1 != col2:
                                 #result_df = both_files.copy()
                                 if "Result" in result_df.columns:
                                     result_df.drop(columns =["Result"], inplace=True)
