@@ -165,22 +165,22 @@ if df1 is not None:
                             col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
                             operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
-                            merge_col_key = merge_col_df1
-                            if merge_col_key in both_files.columns:
-                                result_df = both_files[[merge_col_key,col1,col2]].copy()
-                            else:
-                                result_df = both_files[[col1, col2]].copy()
-                                if col1 != col2:
-                                    result_df = both_files.copy()
-                                    if "Result" in result_df.columns:
-                                        result_df.drop(columns =["Result"], inplace=True)
-                                    if operation == "Add":
-                                        result_df["Result"] = result_df[col1] + result_df[col2]
-                                        st.success(f"Successfully added:{col1} + {col2}")
-                                    else:
-                                        result_df["Result"] = result_df[col1] - result_df[col2]
-                                        st.success(f"Computed:{col1} - {col2}")
-                                    st.dataframe(result_df[[col1, col2, "Result"]].head(10))
+                            #merge_key_col = merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
+                            #selected_columns = [merge_key_col,col1,col2]     
+                            #result_df = both_files[selected_columns].copy()
+                            if col1 !=col2:
+                                selected_columns = [merge_key_col,col1,col2]     
+                                result_df = both_files[selected_columns].copy()
+                                #result_df = both_files.copy()
+                                if "Result" in result_df.columns:
+                                    result_df.drop(columns =["Result"], inplace=True)
+                                if operation == "Add":
+                                    result_df["Result"] = result_df[col1] + result_df[col2]
+                                    st.success(f"Successfully added:{col1} + {col2}")
+                                else:
+                                    result_df["Result"] = result_df[col1] - result_df[col2]
+                                    st.success(f"Computed:{col1} - {col2}")
+                                st.dataframe(result_df[[col1, col2, "Result"]].head(10))
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
