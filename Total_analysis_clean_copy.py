@@ -167,15 +167,15 @@ if df1 is not None:
 
                             if col1 and col2:
                                 result_df = both_files.copy()
-                                if "Result" in both_files.columns:
-                                    #both_files.drop(columns =["Result"], inplace=True)
-                                    if operation == "Add":
-                                        result_df["Result"] = result_df[col1] + result_df[col2]
-                                        st.success(f"Computed:{col1} + {col2}")
-                                    else:
-                                        result_df["Result"] = result_df[col1] - result_df[col2]
-                                        st.success(f"Computed:{col1} - {col2}")
-                                    st.dataframe(result_df[[col1, col2, "Result"]].head(10))
+                                if "Result" in result_df.columns:
+                                    result_df.drop(columns =["Result"], inplace=True)
+                                if operation == "Add":
+                                    result_df["Result"] = result_df[col1] + result_df[col2]
+                                    st.success(f"Successfully added:{col1} + {col2}")
+                                else:
+                                    result_df["Result"] = result_df[col1] - result_df[col2]
+                                    st.success(f"Computed:{col1} - {col2}")
+                                st.dataframe(result_df[[col1, col2, "Result"]].head(10))
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
