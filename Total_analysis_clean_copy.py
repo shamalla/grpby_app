@@ -167,8 +167,8 @@ if df1 is not None:
 
                             if col1 and col2:
                                 result_df = both_files.copy()
-                                if "Result" in result_df.columns:
-                                    result_df.drop(columns =["Result"], inplace=True)
+                                #if "Result" in result_df.columns:
+                                    #result_df.drop(columns =["Result"], inplace=True)
                                 if operation == "Add":
                                     result_df["Result"] = result_df[col1] + result_df[col2]
                                     st.success(f"Successfully added:{col1} + {col2}")
