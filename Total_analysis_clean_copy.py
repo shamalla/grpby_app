@@ -155,7 +155,7 @@ if df1 is not None:
 
                     #result_df = both_files.copy()
                     with st.expander("Add or subtract Two numeric columns"):
-                        numeric_columns = result_df.select_dtypes(include = "number").columns.tolist()
+                        numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
                     
                         if len(numeric_columns) < 2:
                             st.warning("Need atleast two numeric columns to add or subtract.")
