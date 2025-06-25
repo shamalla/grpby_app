@@ -152,6 +152,8 @@ if df1 is not None:
                     st.dataframe(both_files.head())
                     with st.expander("Summary of Both rows"):
                         st.write(both_files.describe(include = "all"))
+
+                    result_df = both_files.copy()
                     with st.expander("Add or subtract Two numeric columns"):
                         numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
                     
