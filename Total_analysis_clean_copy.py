@@ -82,34 +82,34 @@ if df1 is not None:
         #How do you want to merge your data
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
         #To input a function that now removes duplicate by inputing a suffix 
-        def safe_rename_columns(df, merge_col,suffix):
-            cols = df.columns.tolist()
-            seen = {}
-            new_base_cols = []
-            for col in cols:
-                if col not in seen:
-                    seen[col] = 1
-                    new_base_cols.append(col)
-                else:
-                    count = seen[col]
-                    new_name = f"{col}_{count}"
-                    while new_name in seen:
-                        count += 1
-                        new_name = f"{col}_{count}"
-                    seen[col] = count + 1
-                    seen[new_name] = 1
-                    new_base_cols.append(new_name)
-            df.columns = new_base_cols
+        #def safe_rename_columns(df, merge_col,suffix):
+            #cols = df.columns.tolist()
+            #seen = {}
+            #new_base_cols = []
+            #for col in cols:
+                #if col not in seen:
+                    #seen[col] = 1
+                    #new_base_cols.append(col)
+                #else:
+                    #count = seen[col]
+                    #new_name = f"{col}_{count}"
+                    #while new_name in seen:
+                        #count += 1
+                        #new_name = f"{col}_{count}"
+                    #seen[col] = count + 1
+                    #seen[new_name] = 1
+                    #new_base_cols.append(new_name)
+            #df.columns = new_base_cols
 
             # Step 2: Add suffix except for merge column
-            final_cols = []
-            for col in df.columns:
-                if col == merge_col:
-                    final_cols.append(col)
-                else:
-                    final_cols.append(f"{col}_{suffix}")
-            df.columns = final_cols
-            return df
+            #final_cols = []
+            #for col in df.columns:
+                #if col == merge_col:
+                    #final_cols.append(col)
+                #else:
+                    #final_cols.append(f"{col}_{suffix}")
+            #df.columns = final_cols
+            #return df
 
 
         #Columns to be included in our merge
@@ -129,13 +129,13 @@ if df1 is not None:
             df1_subset = df1.copy()
             df2_subset = df2.copy()
 
-        df1_subset = safe_rename_columns(df1_subset, merge_col_df1, "fl1")
-        df2_subset = safe_rename_columns(df2_subset, merge_col_df2, "fl2")
+        #df1_subset = safe_rename_columns(df1_subset, merge_col_df1, "fl1")
+        #df2_subset = safe_rename_columns(df2_subset, merge_col_df2, "fl2")
 
-        common_cols = set(df1_subset.columns) & set(df2_subset.columns)
-        if common_cols:
-            st.error(f" Merge failed: Still found duplicate columns: {list(common_cols)}")
-        else:
+        #common_cols = set(df1_subset.columns) & set(df2_subset.columns)
+        #if common_cols:
+            #st.error(f" Merge failed: Still found duplicate columns: {list(common_cols)}")
+        #else:
             #perform the merge function
             try:
                 merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
@@ -152,29 +152,29 @@ if df1 is not None:
                     st.dataframe(both_files.head())
                     with st.expander("Summary of Both rows"):
                         st.write(both_files.describe(include = "all"))
-                    with st.expander("Add or subtract Two numeric columns"):
-                        numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
+                    #with st.expander("Add or subtract Two numeric columns"):
+                        #numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
                     
-                        if len(numeric_columns) < 2:
-                            st.warning("Need atleast two numeric columns to add or subtract.")
+                        #if len(numeric_columns) < 2:
+                            #st.warning("Need atleast two numeric columns to add or subtract.")
 
-                        else:
-                            col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
-                            col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
-                            operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
+                        #else:
+                            #col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
+                            #col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
+                            #operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
-                            if col1 and col2:
-                                if "Result" in both_files.columns:
-                                    both_files.drop(columns =["Result"], inplace=True)
-                                if operation == "Add":
-                                    both_files["Result"] = both_files[col1] + both_files[col2]
-                                    st.success(f"{col1} + {col2}")
-                                else:
-                                    both_files["Result"] = both_files[col1] - both_files[col2]
-                                    st.success(f"{col1} - {col2}")
+                            #if col1 and col2:
+                                #if "Result" in both_files.columns:
+                                    #both_files.drop(columns =["Result"], inplace=True)
+                                #if operation == "Add":
+                                    #both_files["Result"] = both_files[col1] + both_files[col2]
+                                    #st.success(f"{col1} + {col2}")
+                                #else:
+                                    #both_files["Result"] = both_files[col1] - both_files[col2]
+                                    #st.success(f"{col1} - {col2}")
 
-                                with st.expander("Preview of Result"):
-                                    st.dataframe(both_files[[col1, col2, "Result"]].head(10))
+                                #with st.expander("Preview of Result"):
+                                    #st.dataframe(both_files[[col1, col2, "Result"]].head(10))
                 
                 #Rows from Left table only
                 with st.expander("Rows from File 1 only"):
