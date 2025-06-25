@@ -169,7 +169,7 @@ if df1 is not None:
                             #selected_columns = [merge_key_col,col1,col2]     
                             #result_df = both_files[selected_columns].copy()
                             if col1 !=col2:     
-                                result_df = both_files[merge_col_df1,col1,col2].copy()
+                                result_df = both_files[[merge_col_df1,col1,col2]].copy()
                                 #result_df = both_files.copy()
                                 if "Result" in result_df.columns:
                                     result_df.drop(columns =["Result"], inplace=True)
