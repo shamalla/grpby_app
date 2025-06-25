@@ -153,7 +153,7 @@ if df1 is not None:
                     with st.expander("Summary of Both rows"):
                         st.write(both_files.describe(include = "all"))
 
-                    result_df = both_files.copy()
+                    #result_df = both_files.copy()
                     with st.expander("Add or subtract Two numeric columns"):
                         numeric_columns = result_df.select_dtypes(include = "number").columns.tolist()
                     
@@ -165,8 +165,9 @@ if df1 is not None:
                             col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
                             operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
+                            result_df = both_files[[col1, col2]].copy()
                             if col1 and col2:
-                                result_df = both_files.copy()
+                                #result_df = both_files.copy()
                                 if "Result" in result_df.columns:
                                     result_df.drop(columns =["Result"], inplace=True)
                                 if operation == "Add":
