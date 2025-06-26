@@ -187,8 +187,10 @@ if df1 is not None:
                                     st.success(f"Successfully added:{col1} + {col2}")
                                 else:
                                     result_df["Result"] = result_df[col1] - result_df[col2]
-                                    st.success(f"Computed:{col1} - {col2}")
-                                st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(10))
+                                    st.success(f"Successfully subtracted:{col1} - {col2}")
+
+                                num_rows = st.slider(f"Select number of rows to preview - {Result}", min_value = 5, max_value = 1000, value = 10 )
+                                st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
