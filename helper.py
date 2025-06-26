@@ -87,6 +87,8 @@ def analyze_file(df,label = "File"):
     if selected_cols and aggf and grpby_col:
         try:
             grouped_df = df.groupby(grpby_col)[selected_cols].agg(aggf)
+            grouped_df.columns = ['_'.join(col).strip() if isinstance(col, tuple) else col for col in grouped_df.columns.values]
+            grouped_df.reset_index(inplace=True)
             st.subheader("Grouped Result")
             st.dataframe(grouped_df)
         except Exception as e:
