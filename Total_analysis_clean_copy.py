@@ -189,7 +189,7 @@ if df1 is not None:
                                     result_df["Result"] = result_df[col1] - result_df[col2]
                                     st.success(f"Successfully subtracted:{col1} - {col2}")
 
-                                num_rows = st.slider(f"Select number of rows to preview - {Result}", min_value = 5, max_value = 1000, value = 10 )
+                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
                                 st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
 
                                     #with st.expander("Preview of Result"):
