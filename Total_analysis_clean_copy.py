@@ -188,7 +188,7 @@ if df1 is not None:
                                 else:
                                     result_df["Result"] = result_df[col1] - result_df[col2]
                                     st.success(f"Computed:{col1} - {col2}")
-                                st.dataframe(result_df[[col1, col2, "Result"]].head(10))
+                                st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(10))
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
