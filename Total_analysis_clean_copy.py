@@ -26,7 +26,7 @@ if file2:
 if df1 is not None:
     options = ["Analyze File 1 only"]
     if df2 is not None:
-        options.extend(["Analyze File 2 only", "Analyze File 1 and File 2 separetly", "Merge File 1 and File 2, then analyze"])
+        options.extend(["Analyze File 2 only", "Analyze File 1 and File 2 separetly", "Reconcile File 1 and File 2 "])
     choice = st.radio("What analysis do you want?",options)
 
     if choice == "Analyze File 1 only":
@@ -44,7 +44,7 @@ if df1 is not None:
         st.header("Analysis for File 2")
         df2 = analyze_file(df2, label = "File 2")
 
-    elif choice == "Merge File 1 and File 2, then analyze" and df2 is not None:
+    elif choice == "Reconcile File 1 and File 2" and df2 is not None:
         #Merging the two data and doing analysis on them
         st.subheader("Clean files before merging")
         #Drop duplicates if user wants
@@ -74,7 +74,7 @@ if df1 is not None:
             after = df2.shape[0]
             st.warning(f"{before - after} rows droped from File 2 due to nulls.")
             
-        st.subheader("Merging analysis")
+        st.subheader("Reconciliation analysis")
         #Select columns to merge on which have same data in each file1
         merge_col_df1 = st.selectbox("Select column to merge on from File 1",df1.columns, key = "merge_col1")
         merge_col_df2 = st.selectbox("Select column to mergr on from File 2",df2.columns, key = "merge_col2")
