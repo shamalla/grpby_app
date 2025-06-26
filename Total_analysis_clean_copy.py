@@ -26,7 +26,7 @@ if file2:
 if df1 is not None:
     options = ["Analyze File 1 only"]
     if df2 is not None:
-        options.extend(["Analyze File 2 only", "Analyze File 1 and File 2 separetly", "Reconcile File 1 and File 2 "])
+        options.extend(["Analyze File 2 only", "Analyze File 1 and File 2 separetly", "Reconcile File 1 and File 2"])
     choice = st.radio("What analysis do you want?",options)
 
     if choice == "Analyze File 1 only":
