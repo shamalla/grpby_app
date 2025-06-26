@@ -15,13 +15,13 @@ if file1 :
     xls1 = pd.ExcelFile(file1)
     sheet_names1 = xls1.sheet_names
     selected_sheet1 = st.selectbox("Select sheet to analyze for File 1", sheet_names1, key = "f1")
-    df1 = pd.read_excel(file1, sheet_name=selected_sheet1) if file1.name.endswith("xlsx") else pd.read_csv(file1)
+    df1 = pd.read_excel(file1, sheet_name=selected_sheet1,header=0) if file1.name.endswith("xlsx") else pd.read_csv(file1,header=0)
     st.success(f"Loaded: {selected_sheet1} from File 1")
 if file2:
     xls2 = pd.ExcelFile(file2)
     sheet_names2 = xls2.sheet_names
     selected_sheet2 = st.selectbox("Select sheet to analyze for File 2", sheet_names2,key = "f2")
-    df2 = pd.read_excel(file2, sheet_name=selected_sheet2) if file2.name.endswith("xlsx") else pd.read_csv(file2)
+    df2 = pd.read_excel(file2, sheet_name=selected_sheet2,header=0) if file2.name.endswith("xlsx") else pd.read_csv(file2,header=0)
     st.success(f"Loaded: {selected_sheet2} from File 2")
 if df1 is not None:
     options = ["Analyze File 1 only"]
@@ -77,7 +77,7 @@ if df1 is not None:
         st.subheader("Reconciliation analysis")
         #Select columns to merge on which have same data in each file1
         merge_col_df1 = st.selectbox("Select column to merge on from File 1",df1.columns, key = "merge_col1")
-        merge_col_df2 = st.selectbox("Select column to mergr on from File 2",df2.columns, key = "merge_col2")
+        merge_col_df2 = st.selectbox("Select column to merge on from File 2",df2.columns, key = "merge_col2")
 
         #How do you want to merge your data
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
@@ -113,7 +113,7 @@ if df1 is not None:
 
 
         #Columns to be included in our merge
-        cols_inc = st.radio("Columns to include in the merge analysis",["Use all colums","Select specific_columns"])
+        cols_inc = st.radio("Columns to include in the reconciliation",["Use all colums","Select specific_columns"])
         if cols_inc == "Select specific_columns":
             cols_df1 = st.multiselect("Select columns to be included from df1",df1.columns.tolist(), default = [merge_col_df1], key = "col_d_f1")
             cols_df2 = st.multiselect("Select columns to be included from File 2",df2.columns.tolist(), default = [merge_col_df2], key = "col_d_f2")
