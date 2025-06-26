@@ -6,9 +6,26 @@ from helper import analyze_file
 
 st.title = ("Total Analytics")
 st.subheader(f"Karibu. Welcome. Bienvenue... Please upload your file(s).")
+st.markdown("**Note:** Please ensure the first row of your file contains the column headers before uploading.")
 file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","csv"], key = "file1")
 file2 = st.file_uploader("Upload your file (optional)", type = ["xlsx","xlx","csv"], key = "file2")
 df1 , df2 = None, None
+
+#---optional: Let the user select which row to use as header---
+#st.markdown("(Experimental) Choose which row to use as column header:")
+#header_row = st.number_input("Row number(starting from 0)",min_value = 0,step=1,value=0)
+# if file1:
+#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1, header=header_row)
+# if file2:
+#     df2 = pd.read_excel(file2, sheet_name=selected_sheet2, header=header_row)
+
+#option2
+#select_custom_header = st.checkbox("Manually select header row",value = False)
+# if use_custom_header:
+#     header_row = st.number_input("Select header row index (0-based)", min_value=0, value=0)
+#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1, header=header_row)
+# else:
+#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1)
 
 #Loaded files
 if file1 :
