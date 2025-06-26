@@ -156,6 +156,7 @@ if df1 is not None:
                     #result_df = both_files.copy()
                     with st.expander("Add or subtract Two numeric columns"):
                         numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
+                        all_columns = both_files.columns.tolist()
                     
                         if len(numeric_columns) < 2:
                             st.warning("Need atleast two numeric columns to add or subtract.")
@@ -163,17 +164,20 @@ if df1 is not None:
                         else:
                             col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
                             col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
+
+                            id_column_option = [col for col in all_columns if col not in [col1,col2]]
+                            id_col = st.selectbox("select an identifier column to include", id_column_option, key= "id_col")
                             operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
                             #merge_key_col = merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
-                            #selected_columns = [merge_key_col,col1,col2]     
-                            #result_df = both_files[selected_columns].copy()
-                            possible_merge_cols = [merge_col_df1, merge_col_df2, f"{merge_col_df1}_fl1", f"{merge_col_df2}_fl2"]
-                            merge_key_col = next((col for col in possible_merge_cols if col in both_files.columns), None)
+                            selected_columns = [id_col,col1,col2]     
+                            result_df = both_files[selected_columns].copy()
+                            #possible_merge_cols = [merge_col_df1, merge_col_df2, f"{merge_col_df1}_fl1", f"{merge_col_df2}_fl2"]
+                            #merge_key_col = next((col for col in possible_merge_cols if col in both_files.columns), None)
                             if col1 !=col2:   
-                                if merge_key_col: #= merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
-                                    selected_columns = [merge_key_col,col1,col2]     
-                                result_df = both_files[selected_columns].copy()  
+                                #if merge_key_col: #= merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
+                                    #selected_columns = [merge_key_col,col1,col2]     
+                                #result_df = both_files[selected_columns].copy()  
                                 #result_df = both_files[[merge_col_df1,col1,col2]].copy()
                                 #result_df = both_files.copy()
                                 if "Result" in result_df.columns:
