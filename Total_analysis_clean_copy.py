@@ -147,28 +147,27 @@ if df1 is not None:
         else:
             df1_subset = df1.copy()
             df2_subset = df2.copy()
+
+        st.write("🧪 Merge setup:")
+        st.write("df1 columns:", df1_subset.columns.tolist())
+        st.write("df2 columns:", df2_subset.columns.tolist())
+        st.write("Merge keys:", merge_col_df1, "(df1) and", merge_col_df2, "(df2)")
             #perform the merge function
-            try:
-                st.write("Merging with the following keys:")
-                st.write("Left (df1):", merge_col_df1)
-                st.write("Right (df2):", merge_col_df2)
-                st.write("df1_subset columns:", df1_subset.columns.tolist())
-                st.write("df2_subset columns:", df2_subset.columns.tolist())
+        try:
+            merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
+            st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
+            st.dataframe(merged_df.head(10))
 
-                merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
-                st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
-                st.dataframe(merged_df.head(10))
-
-                both_files = merged_df[merged_df["_merge"] == "both"]
-                left_only = merged_df[merged_df["_merge"] == "left_only"]
-                right_only = merged_df[merged_df["_merge"] == "right_only"]
+            both_files = merged_df[merged_df["_merge"] == "both"]
+            left_only = merged_df[merged_df["_merge"] == "left_only"]
+            right_only = merged_df[merged_df["_merge"] == "right_only"]
 
                 #Rows from all the tables
-                with st.expander("Rows from both files"):
-                    st.write(f"Shape:{both_files.shape}")
-                    st.dataframe(both_files.head())
-                    with st.expander("Summary of Both rows"):
-                        st.write(both_files.describe(include = "all"))
+            with st.expander("Rows from both files"):
+                st.write(f"Shape:{both_files.shape}")
+                st.dataframe(both_files.head())
+                with st.expander("Summary of Both rows"):
+                    st.write(both_files.describe(include = "all"))
 
                     #result_df = both_files.copy()
                     with st.expander("Add or subtract Two numeric columns"):
