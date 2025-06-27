@@ -202,10 +202,10 @@ if df1 is not None:
                                 result_df["Result"] = result_df[col1] - result_df[col2]
                                 st.success(f"Successfully subtracted:{col1} - {col2}")
 
-                                with st.expander("Summary of the Result"):
-                                    num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
-                                    st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
-                                    st.write(result_df.describe(include="all"))
+                            with st.expander("Summary of the Result"):
+                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
+                                st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
+                                #st.write(result_df.describe(include="all"))
                                 
                             
 
