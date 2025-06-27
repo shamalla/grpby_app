@@ -147,14 +147,6 @@ if df1 is not None:
         else:
             df1_subset = df1.copy()
             df2_subset = df2.copy()
-
-        #df1_subset = safe_rename_columns(df1_subset, merge_col_df1, "fl1")
-        #df2_subset = safe_rename_columns(df2_subset, merge_col_df2, "fl2")
-
-        #common_cols = set(df1_subset.columns) & set(df2_subset.columns)
-        #if common_cols:
-            #st.error(f" Merge failed: Still found duplicate columns: {list(common_cols)}")
-        #else:
             #perform the merge function
             try:
                 merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
