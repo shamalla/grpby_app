@@ -135,7 +135,7 @@ if df1 is not None:
         default_df2 = list(set([merge_col_df2]) | set(df2.columns.tolist()))
         if cols_inc == "Select specific_columns":
             cols_df1 = st.multiselect("Select columns to be included from df1",options=df1.columns.tolist(), default=[col for col in default_df1 if col in df1.columns],key="col_d_f1")
-            cols_df2 = st.multiselect("Select columns to be included from File 2",doptions=df2.columns.tolist(),default=[col for col in default_df2 if col in df2.columns],key="col_d_f2")
+            cols_df2 = st.multiselect("Select columns to be included from File 2",options=df2.columns.tolist(),default=[col for col in default_df2 if col in df2.columns],key="col_d_f2")
             #Ensuring merged columns are included
             if merge_col_df1 not in cols_df1:
                 cols_df1.append(merge_col_df1)
