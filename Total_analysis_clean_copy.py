@@ -204,6 +204,10 @@ if df1 is not None:
 
                             num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
                             st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
+                            with st.expander("Summary of the Result"):
+                                st.write(result_df.describe(include="all"))
+                                
+                            
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
