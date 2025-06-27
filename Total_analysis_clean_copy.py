@@ -149,6 +149,12 @@ if df1 is not None:
             df2_subset = df2.copy()
             #perform the merge function
             try:
+                st.write("Merging with the following keys:")
+                st.write("Left (df1):", merge_col_df1)
+                st.write("Right (df2):", merge_col_df2)
+                st.write("df1_subset columns:", df1_subset.columns.tolist())
+                st.write("df2_subset columns:", df2_subset.columns.tolist())
+
                 merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
                 st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
                 st.dataframe(merged_df.head(10))
