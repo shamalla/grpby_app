@@ -222,8 +222,8 @@ if df1 is not None:
                     with st.expander("Summary of files from File 2"):
                         st.write(right_only.describe(include = "all"))
 
-            except Exception as e:
-                st.error(f"Merger failed: {e}")
+        except Exception as e:
+            st.error(f"Merger failed: {e}")
             
 else:
     st.info("Please load your data to begin.")
