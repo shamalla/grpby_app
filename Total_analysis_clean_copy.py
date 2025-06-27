@@ -209,18 +209,18 @@ if df1 is not None:
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
                 
                 #Rows from Left table only
-                with st.expander("Rows from File 1 only"):
-                    st.write(f"Shape:{left_only.shape}")
-                    st.dataframe(left_only.head())
-                    with st.expander("Summary of files from File 1"):
-                        st.write(left_only.describe(include = "all"))
+            with st.expander("Rows from File 1 only"):
+                st.write(f"Shape:{left_only.shape}")
+                st.dataframe(left_only.head())
+                with st.expander("Summary of files from File 1"):
+                    st.write(left_only.describe(include = "all"))
 
                 #Rows from right Table only
-                with st.expander("Rows from File 2 only"):
-                    st.write(f"Shape:{right_only.shape}")
-                    st.dataframe(right_only.head())
-                    with st.expander("Summary of files from File 2"):
-                        st.write(right_only.describe(include = "all"))
+            with st.expander("Rows from File 2 only"):
+                st.write(f"Shape:{right_only.shape}")
+                st.dataframe(right_only.head())
+                with st.expander("Summary of files from File 2"):
+                    st.write(right_only.describe(include = "all"))
 
         except Exception as e:
             st.error(f"Merger failed: {e}")
