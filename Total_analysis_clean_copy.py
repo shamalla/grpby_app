@@ -148,10 +148,7 @@ if df1 is not None:
             df1_subset = df1.copy()
             df2_subset = df2.copy()
 
-        st.write("🧪 Merge setup:")
-        st.write("df1 columns:", df1_subset.columns.tolist())
-        st.write("df2 columns:", df2_subset.columns.tolist())
-        st.write("Merge keys:", merge_col_df1, "(df1) and", merge_col_df2, "(df2)")
+        
             #perform the merge function
         try:
             merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
@@ -170,43 +167,43 @@ if df1 is not None:
                     st.write(both_files.describe(include = "all"))
 
                     #result_df = both_files.copy()
-                    with st.expander("Add or subtract Two numeric columns"):
-                        numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
-                        all_columns = both_files.columns.tolist()
+                with st.expander("Add or subtract Two numeric columns"):
+                    numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
+                    all_columns = both_files.columns.tolist()
                     
-                        if len(numeric_columns) < 2:
-                            st.warning("Need atleast two numeric columns to add or subtract.")
+                    if len(numeric_columns) < 2:
+                        st.warning("Need atleast two numeric columns to add or subtract.")
 
-                        else:
-                            col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
-                            col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
+                    else:
+                        col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
+                        col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
 
-                            id_column_option = [col for col in all_columns if col not in [col1,col2]]
-                            id_col = st.selectbox("select an identifier column to include", id_column_option, key= "id_col")
-                            operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
+                        id_column_option = [col for col in all_columns if col not in [col1,col2]]
+                        id_col = st.selectbox("select an identifier column to include", id_column_option, key= "id_col")
+                        operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
                             #merge_key_col = merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
-                            selected_columns = [id_col,col1,col2]     
-                            result_df = both_files[selected_columns].copy()
+                        selected_columns = [id_col,col1,col2]     
+                        result_df = both_files[selected_columns].copy()
                             #possible_merge_cols = [merge_col_df1, merge_col_df2, f"{merge_col_df1}_fl1", f"{merge_col_df2}_fl2"]
                             #merge_key_col = next((col for col in possible_merge_cols if col in both_files.columns), None)
-                            if col1 !=col2:   
+                        if col1 !=col2:   
                                 #if merge_key_col: #= merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
                                     #selected_columns = [merge_key_col,col1,col2]     
                                 #result_df = both_files[selected_columns].copy()  
                                 #result_df = both_files[[merge_col_df1,col1,col2]].copy()
                                 #result_df = both_files.copy()
-                                if "Result" in result_df.columns:
-                                    result_df.drop(columns =["Result"], inplace=True)
-                                if operation == "Add":
-                                    result_df["Result"] = result_df[col1] + result_df[col2]
-                                    st.success(f"Successfully added:{col1} + {col2}")
-                                else:
-                                    result_df["Result"] = result_df[col1] - result_df[col2]
-                                    st.success(f"Successfully subtracted:{col1} - {col2}")
+                            if "Result" in result_df.columns:
+                                result_df.drop(columns =["Result"], inplace=True)
+                            if operation == "Add":
+                                result_df["Result"] = result_df[col1] + result_df[col2]
+                                st.success(f"Successfully added:{col1} + {col2}")
+                            else:
+                                result_df["Result"] = result_df[col1] - result_df[col2]
+                                st.success(f"Successfully subtracted:{col1} - {col2}")
 
-                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
-                                st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
+                            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
+                            st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
