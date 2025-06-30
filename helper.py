@@ -74,25 +74,45 @@ def analyze_file(df,label = "File"):
     with st.expander(f"A copy of {label} summary statisic"):
         st.write(df.describe(include = "all"))
     #Group by function
-    st.subheader(f"Group by statistics for {label}")
-    grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns)
-    aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"])
+    st.subheader(f"Analytics for {label}")
+    with st.expander(f"Groupby Analytics for {label}"):
+        grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns)
+        grp_aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"])
     #Select only numeric columns
-    numeric_cols = df.select_dtypes(include = "number").columns
-    selected_cols = []
-    if len(numeric_cols) == 0:
-        st.warning(f"No numeric columns available for aggregation in {label}.")
-    elif grpby_col:
-        selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols))
-    if selected_cols and aggf and grpby_col:
-        try:
-            grouped_df = df.groupby(grpby_col)[selected_cols].agg(aggf)
-            grouped_df.columns = ['_'.join(col).strip() if isinstance(col, tuple) else col for col in grouped_df.columns.values]
-            grouped_df.reset_index(inplace=True)
-            st.subheader("Grouped Result")
-            st.dataframe(grouped_df)
-        except Exception as e:
-            st.error(f"Error during grouping in {label}: {e}")
-    else:
-        st.info("Please select at least one numeric column and one aggregate function to aggregate")
+        numeric_cols = df.select_dtypes(include = "number").columns
+        selected_cols = []
+        if len(numeric_cols) == 0:
+            st.warning(f"No numeric columns available for aggregation in {label}.")
+        elif grpby_col:
+            selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols))
+        if selected_cols and grp_aggf and grpby_col:
+            try:
+                grouped_df = df.groupby(grpby_col)[selected_cols].agg(grp_aggf)
+                grouped_df.columns = ['_'.join(col).strip() if isinstance(col, tuple) else col for col in grouped_df.columns.values]
+                grouped_df.reset_index(inplace=True)
+                st.subheader("Grouped Result")
+                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
+                st.dataframe(grouped_df)
+            except Exception as e:
+                st.error(f"Error during grouping in {label}: {e}")
+    with st.expander(f"Pivot Table for{label}"):
+        pv_idx_col = st.multiselect(f"Select columns to use as index in {label}",df.columns)
+        pv_col = st.multiselect(f"Select columns to split horizontally in {label}",df.columns)
+        pv_aggf = st.multiselect(f"Select an aggregate function to aggrgate in {label}",["mean","sum","count","min","max"])
+        pv_numeric_val = df.select_dtypes(include = "number").columns
+        if len(pv_numeric_val) == 0:
+            st.warning(f"No numeric columns availlable for aggregation in {label}.") 
+            pv_values = []
+        else:
+            pv_values = st.multiselect(f"Select numeric columns to aggregate in {label}",pv_numeric_val, default = list(pv_numeric_val))
+        if  pv_idx_col and pv_values and pv_aggf:
+            try:
+                pv_table = df.pivot_table(index =pv_idx_col ,columns = pv_col,values= pv_numeric_val,aggfunc = pv_aggf, fill_value = 0)
+                pv_table.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table.columns]
+                pv_table.reset_index(inplace = True)
+                st.dataframe(pv_table)
+            except Exception as e:
+                st.error(f"Error during pivot_tabling in {label}: {e}")
+        else:
+            st.info("Please select at least one numeric column and one aggregate function to aggregate")
     return df
