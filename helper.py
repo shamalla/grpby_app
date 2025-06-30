@@ -76,15 +76,15 @@ def analyze_file(df,label = "File"):
     #Group by function
     st.subheader(f"Analytics for {label}")
     with st.expander(f"Groupby Analytics for {label}"):
-        grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns)
-        grp_aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"])
+        grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns, key = "gr_col")
+        grp_aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"],key = "gr_ag")
     #Select only numeric columns
         numeric_cols = df.select_dtypes(include = "number").columns
         selected_cols = []
         if len(numeric_cols) == 0:
             st.warning(f"No numeric columns available for aggregation in {label}.")
         elif grpby_col:
-            selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols))
+            selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols),key = "gr_sel_cl")
         if selected_cols and grp_aggf and grpby_col:
             try:
                 grouped_df = df.groupby(grpby_col)[selected_cols].agg(grp_aggf)
@@ -95,10 +95,15 @@ def analyze_file(df,label = "File"):
                 st.dataframe(grouped_df)
             except Exception as e:
                 st.error(f"Error during grouping in {label}: {e}")
+        else:
+            st.info("Please select at least one numeric column and one aggregate function to aggregate")  
+            
+
+
     with st.expander(f"Pivot Table for{label}"):
-        pv_idx_col = st.multiselect(f"Select columns to use as index in {label}",df.columns)
-        pv_col = st.multiselect(f"Select columns to split horizontally in {label}",df.columns)
-        pv_aggf = st.multiselect(f"Select an aggregate function to aggrgate in {label}",["mean","sum","count","min","max"])
+        pv_idx_col = st.multiselect(f"Select columns to use as index in {label}",df.columns, key = "pv_id_cl")
+        pv_col = st.multiselect(f"Select columns to split horizontally in {label}",df.columns, key = "pv_cl")
+        pv_aggf = st.multiselect(f"Select an aggregate function to aggrgate in {label}",["mean","sum","count","min","max"], key = "pv_n_cl")
         pv_numeric_val = df.select_dtypes(include = "number").columns
         if len(pv_numeric_val) == 0:
             st.warning(f"No numeric columns availlable for aggregation in {label}.") 
