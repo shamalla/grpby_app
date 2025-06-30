@@ -112,12 +112,12 @@ def analyze_file(df,label = "File"):
             pv_values = st.multiselect(f"Select numeric columns to aggregate in {label}",pv_numeric_val, default = list(pv_numeric_val))
         if  pv_idx_col and pv_values and pv_aggf:
             try:
-                pv_table = df.pivot_table(index =pv_idx_col ,columns = pv_col,values= pv_numeric_val,aggfunc = pv_aggf, fill_value = 0)
+                pv_table = df.pivot_table(index =pv_idx_col ,columns = pv_col,values= pv_values,aggfunc = pv_aggf, fill_value = 0)
                 pv_table.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table.columns]
                 pv_table.reset_index(inplace = True)
                 st.dataframe(pv_table)
             except Exception as e:
                 st.error(f"Error during pivot_tabling in {label}: {e}")
         else:
-            st.info("Please select at least one numeric column and one aggregate function to aggregate")
+            st.info("Please select at least one index column,one numeric column and one aggregate function to aggregate")
     return df
