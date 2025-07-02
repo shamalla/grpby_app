@@ -112,11 +112,7 @@ def analyze_file(df,label = "File"):
             pv_values = st.multiselect(f"Select numeric columns to aggregate in {label}",pv_numeric_val, default = list(pv_numeric_val))
         if  pv_idx_col and pv_values and pv_aggf:
             try:
-<<<<<<< HEAD
                 pv_table = df.pivot_table(index =pv_idx_col ,columns = pv_col if pv_col else None,values= pv_values,aggfunc = pv_aggf if len(pv_aggf) > 1 else pv_aggf[0], fill_value = 0)
-=======
-                pv_table = df.pivot_table(index =pv_idx_col ,columns = pv_col,values= pv_values,aggfunc = pv_aggf, fill_value = 0)
->>>>>>> parent of 0893dc2 (Adding an option on the column part so that if the col is not chosesn it is still okay)
                 pv_table.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table.columns]
                 pv_table.reset_index(inplace = True)
                 st.dataframe(pv_table)
