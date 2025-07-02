@@ -65,7 +65,15 @@ if df1 is not None:
         #Merging the two data and doing analysis on them
         st.subheader("Clean files before merging")
         #Drop duplicates if user wants
-        st.markdown("***Remove duplicates**")
+        st.markdown("**Deaaling with duplicates**")
+        with st.expander("Duplicate rows in File 1"):
+            df1_dup = df1.duplicated()
+            st.write(df1[df1_dup].head(10))
+        with st.expander("Duplicate rows in File 2"):
+            df2_dup = df2.duplicated()
+            st.write(df2[df2_dup].head(10))
+
+        st.markdown("***Remove duplicated rows**")
         if st.checkbox("Drop duplicates in File 1"):
             before = df1.shape[0]
             df1 = df1.drop_duplicates()
@@ -77,7 +85,10 @@ if df1 is not None:
             after = df2.shape[0]
             st.success(f"{before - after} duplicate rows romeved in File 2.")
         #Drop rows with null values
-        st.markdown("**Drop rows with null values**")
+        st.markdown("**Dealing with Null values**")
+        with st.expander("Missing values per column"):
+            st.write(df1.isnull().sum())
+            st.write(df2.isnull().sum())
         cols1 = st.multiselect("Drop rows in File 1 with null in selected columns:",df1.columns.tolist(),key = "dropna1")
         if cols1:
             before = df1.shape[0]
@@ -90,11 +101,62 @@ if df1 is not None:
             df2 = df2.dropna(subset = cols2)
             after = df2.shape[0]
             st.warning(f"{before - after} rows droped from File 2 due to nulls.")
+
+        use_pivot = st.checkbox("Use Pivot Tables to get unique entries")
+        if use_pivot:
+            st.markdown("### Pivot Table for File 1")
+            with st.expander("Create Pivot Table for File 1"):
+                pv_idx_df1 = st.multiselect(f"Select columns to use as index in df1",df1.columns, key = "pv_id_df1")
+                pv_col_df1 = st.multiselect(f"Select columns to split horizontally in df1",df1.columns, key = "pv_cl_df1")
+                pv_aggf_df1 = st.selectbox(f"Select an aggregate function to aggregate in df1",["mean","sum","count","min","max"], key = "pv_agg_df1") 
+                pv_numeric_val_df1 = df1.select_dtypes(include = "number").columns
+                if len(pv_numeric_val_df1) == 0:
+                    st.warning(f"No numeric columns availlable for aggregation in df1.") 
+                    pv_values_df1 = []
+                else:
+                    pv_values_df1 = st.multiselect(f"Select numeric columns to aggregate in df1",pv_numeric_val_df1, default = list(pv_numeric_val_df1))
+                if  pv_idx_df1 and pv_values_df1 and pv_aggf_df1:
+                    try:
+                        pv_table_df1 = df1.pivot_table(index =pv_idx_df1 ,columns = pv_col_df1 if pv_col_df1 else None,values= pv_values_df1,aggfunc = pv_aggf_df1, fill_value = 0)
+                        pv_table_df1.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table_df1.columns]
+                        pv_table_df1.reset_index(inplace = True)
+                        with st.expander(f"Review your File 1 pivot table"):
+                            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "pv_df1" )
+                            st.dataframe(pv_table_df1)   
+                            st.write(f"Pivot table shape: {pv_table_df1.shape}")
+                    except Exception as e:
+                        st.error(f"Error during pivot_tabling in File 1: {e}")
+
+            st.markdown("### Pivot Table for File 2")
+            with st.expander("Create Pivot Table for File 2"):
+                pv_idx_df2 = st.multiselect(f"Select columns to use as index in df1",df2.columns, key = "pv_id_df2")
+                pv_col_df2 = st.multiselect(f"Select columns to split horizontally in df1",df2.columns, key = "pv_cl_df2")
+                pv_aggf_df2 = st.selectbox(f"Select an aggregate function to aggregate in df2",["mean","sum","count","min","max"], key = "pv_agg_df2") 
+                pv_numeric_val_df2 = df2.select_dtypes(include = "number").columns
+                if len(pv_numeric_val_df2) == 0:
+                    st.warning(f"No numeric columns availlable for aggregation in df2.") 
+                    pv_values_df2 = []
+                else:
+                    pv_values_df2 = st.multiselect(f"Select numeric columns to aggregate in df1",pv_numeric_val_df2, default = list(pv_numeric_val_df2))
+                if  pv_idx_df2 and pv_values_df2 and pv_aggf_df2:
+                    try:
+                        pv_table_df2 = df2.pivot_table(index =pv_idx_df2 ,columns = pv_col_df2 if pv_col_df2 else None,values= pv_values_df2,aggfunc = pv_aggf_df2, fill_value = 0)
+                        pv_table_df2.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table_df2.columns]
+                        pv_table_df2.reset_index(inplace = True)
+                        with st.expander(f"Review your File 2 pivot table"):
+                            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10, key = "pv_df2" )
+                            st.dataframe(pv_table_df2)   
+                            st.write(f"Pivot table shape: {pv_table_df2.shape}")
+                    except Exception as e:
+                        st.error(f"Error during pivot_tabling in File 2: {e}")  
+
             
         st.subheader("Reconciliation analysis")
+        base_df1 = pv_table_df1 if use_pivot and "pv_table_df1" in locals() else df1
+        base_df2 = pv_table_df2 if use_pivot and "pv_table_df2" in locals() else df2
         #Select columns to merge on which have same data in each file1
-        merge_col_df1 = st.selectbox("Select column to merge on from File 1",df1.columns, key = "merge_col1")
-        merge_col_df2 = st.selectbox("Select column to merge on from File 2",df2.columns, key = "merge_col2")
+        merge_col_df1 = st.selectbox("Select column to merge on from File 1",base_df1.columns, key = "merge_col1")
+        merge_col_df2 = st.selectbox("Select column to merge on from File 2",base_df2.columns, key = "merge_col2")
 
         #How do you want to merge your data
         how = st.selectbox("Choose merge type:",["inner","outer","left","right"])
@@ -130,25 +192,23 @@ if df1 is not None:
 
 
         #Columns to be included in our merge
-        cols_inc = st.radio("Columns to include in the reconciliation",["Use all colums","Select specific_columns"])
-        default_df1 = list(set([merge_col_df1]) | set(df1.columns.tolist()))
-        default_df2 = list(set([merge_col_df2]) | set(df2.columns.tolist()))
+        cols_inc = st.radio("Columns to include in the reconciliation",["Use all columns","Select specific_columns"])
+        default_df1 = list(set([merge_col_df1]) | set(base_df1.columns.tolist()))
+        default_df2 = list(set([merge_col_df2]) | set(base_df2.columns.tolist()))
         if cols_inc == "Select specific_columns":
-            cols_df1 = st.multiselect("Select columns to be included from df1",options=df1.columns.tolist(), default=[col for col in default_df1 if col in df1.columns],key="col_d_f1")
-            cols_df2 = st.multiselect("Select columns to be included from File 2",options=df2.columns.tolist(),default=[col for col in default_df2 if col in df2.columns],key="col_d_f2")
+            cols_df1 = st.multiselect("Select columns to be included from df1",options=base_df1.columns.tolist(), default=[col for col in default_df1 if col in base_df1.columns],key="col_d_f1")
+            cols_df2 = st.multiselect("Select columns to be included from File 2",options=base_df2.columns.tolist(),default=[col for col in default_df2 if col in base_df2.columns],key="col_d_f2")
             #Ensuring merged columns are included
             if merge_col_df1 not in cols_df1:
                 cols_df1.append(merge_col_df1)
             if merge_col_df2 not in cols_df2:
                 cols_df2.append(merge_col_df2)
-            df1_subset = df1[cols_df1].copy()
-            df2_subset = df2[cols_df2].copy()
+            df1_subset = base_df1[cols_df1].copy()
+            df2_subset = base_df2[cols_df2].copy()
 
         else:
-            df1_subset = df1.copy()
-            df2_subset = df2.copy()
-
-        
+            df1_subset = base_df1.copy()
+            df2_subset = base_df2.copy()
             #perform the merge function
         try:
             merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
