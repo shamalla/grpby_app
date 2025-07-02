@@ -295,6 +295,42 @@ else:
         with st.expander("Insight of analysed data"):
             st.subheader()
      
+     
+        #df1_subset = safe_rename_columns(df1_subset, merge_col_df1, "fl1")
+        #df2_subset = safe_rename_columns(df2_subset, merge_col_df2, "fl2")
+
+        #common_cols = set(df1_subset.columns) & set(df2_subset.columns)
+        #if common_cols:
+            #st.error(f" Merge failed: Still found duplicate columns: {list(common_cols)}")
+        #else:
+
+
+    #dirty linen
+    st.subheader(f"Analytics for {label}")
+    with st.expander(f"Groupby Analytics for {label}")
+    grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns)
+    aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"])
+    #Select only numeric columns
+    numeric_cols = df.select_dtypes(include = "number").columns
+    selected_cols = []
+    if len(numeric_cols) == 0:
+        st.warning(f"No numeric columns available for aggregation in {label}.")
+    elif grpby_col:
+        selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols))
+    if selected_cols and aggf and grpby_col:
+        try:
+            grouped_df = df.groupby(grpby_col)[selected_cols].agg(aggf)
+            grouped_df.columns = ['_'.join(col).strip() if isinstance(col, tuple) else col for col in grouped_df.columns.values]
+            grouped_df.reset_index(inplace=True)
+            st.subheader("Grouped Result")
+            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
+            st.dataframe(grouped_df)
+        except Exception as e:
+            st.error(f"Error during grouping in {label}: {e}")
+    else:
+        st.info("Please select at least one numeric column and one aggregate function to aggregate")
+    return df
+
         
 
 
