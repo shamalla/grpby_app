@@ -212,7 +212,8 @@ if df1 is not None:
         try:
             merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
             st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
-            st.dataframe(merged_df.head(10))
+            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "merged_df" )                    
+            st.dataframe(merged_df.head(num_rows))
 
             both_files = merged_df[merged_df["_merge"] == "both"]
             left_only = merged_df[merged_df["_merge"] == "left_only"]
