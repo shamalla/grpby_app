@@ -275,7 +275,7 @@ if df1 is not None:
 
                             with st.expander(f"Data from both Files that reconcilliation is greater than (-10 and 10)"):
                                 num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "preview_outside" )
-                                st.dataframe(outside_result[[id_col,col1,col2,"Result"].head(num_rows)])                
+                                st.dataframe(outside_result[[id_col,col1,col2,"Result"]].head(num_rows))                
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
