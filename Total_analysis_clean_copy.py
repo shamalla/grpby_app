@@ -267,15 +267,15 @@ if df1 is not None:
                             with st.expander("Summary of the Result"):
                                 st.write(result_df.describe(include="all"))
 
-                            between_df_files = result_df[result_df[result_df["Result"].between(-10 , 10)]] 
+                            between_df_files = result_df[result_df["Result"].between(-10 , 10)]
                             outside_result = result_df[~result_df["Result"].between(-10 , 10)]              
                             with st.expander(f"Data from both Files that reconciliation is between (-10 and 10)"):
-                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
+                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key ="preview_between" )
                                 st.dataframe(between_df_files[[id_col, col1, col2,"Result"]].head(num_rows))
 
                             with st.expander(f"Data from both Files that reconcilliation is greater than (-10 and 10)"):
-                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
-                                st.datafarme(outside_result[[id_col,col1,col2,"Result"].between(-10,10)])                
+                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "preview_outside" )
+                                st.dataframe(outside_result[[id_col,col1,col2,"Result"].head(num_rows)])                
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
