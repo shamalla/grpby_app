@@ -107,7 +107,7 @@ if df1 is not None:
             st.markdown("### Pivot Table for File 1")
             with st.expander("Create Pivot Table for File 1"):
                 pv_idx_df1 = st.multiselect(f"Select columns to use as index in df1",df1.columns, key = "pv_id_df1")
-                pv_col_df1 = st.multiselect(f"Select columns to split horizontally in df1",df1.columns, key = "pv_cl_df1")
+                pv_col_df1 = st.multiselect(f"Select columns to split horizontally in df1 (optional)",df1.columns, key = "pv_cl_df1")
                 pv_aggf_df1 = st.selectbox(f"Select an aggregate function to aggregate in df1",["mean","sum","count","min","max"], key = "pv_agg_df1") 
                 pv_numeric_val_df1 = df1.select_dtypes(include = "number").columns
                 if len(pv_numeric_val_df1) == 0:
@@ -130,7 +130,7 @@ if df1 is not None:
             st.markdown("### Pivot Table for File 2")
             with st.expander("Create Pivot Table for File 2"):
                 pv_idx_df2 = st.multiselect(f"Select columns to use as index in df1",df2.columns, key = "pv_id_df2")
-                pv_col_df2 = st.multiselect(f"Select columns to split horizontally in df1",df2.columns, key = "pv_cl_df2")
+                pv_col_df2 = st.multiselect(f"Select columns to split horizontally in df1 (optional)",df2.columns, key = "pv_cl_df2")
                 pv_aggf_df2 = st.selectbox(f"Select an aggregate function to aggregate in df2",["mean","sum","count","min","max"], key = "pv_agg_df2") 
                 pv_numeric_val_df2 = df2.select_dtypes(include = "number").columns
                 if len(pv_numeric_val_df2) == 0:
