@@ -114,7 +114,7 @@ if df1 is not None:
                     st.warning(f"No numeric columns availlable for aggregation in df1.") 
                     pv_values_df1 = []
                 else:
-                    pv_values_df1 = st.multiselect(f"Select numeric columns to aggregate in df1",pv_numeric_val_df1, default = list(pv_numeric_val_df1))
+                    pv_values_df1 = st.multiselect(f"Select numeric columns to aggregate in df1",pv_numeric_val_df1, default = list(pv_numeric_val_df1), key ="pv_num_df1")
                 if  pv_idx_df1 and pv_values_df1 and pv_aggf_df1:
                     try:
                         pv_table_df1 = df1.pivot_table(index =pv_idx_df1 ,columns = pv_col_df1 if pv_col_df1 else None,values= pv_values_df1,aggfunc = pv_aggf_df1, fill_value = 0)
@@ -137,7 +137,7 @@ if df1 is not None:
                     st.warning(f"No numeric columns availlable for aggregation in df2.") 
                     pv_values_df2 = []
                 else:
-                    pv_values_df2 = st.multiselect(f"Select numeric columns to aggregate in df1",pv_numeric_val_df2, default = list(pv_numeric_val_df2))
+                    pv_values_df2 = st.multiselect(f"Select numeric columns to aggregate in df2",pv_numeric_val_df2, default = list(pv_numeric_val_df2),key = "pv_num_df2")
                 if  pv_idx_df2 and pv_values_df2 and pv_aggf_df2:
                     try:
                         pv_table_df2 = df2.pivot_table(index =pv_idx_df2 ,columns = pv_col_df2 if pv_col_df2 else None,values= pv_values_df2,aggfunc = pv_aggf_df2, fill_value = 0)
