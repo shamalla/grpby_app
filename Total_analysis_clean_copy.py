@@ -66,10 +66,9 @@ if df1 is not None:
         st.subheader("Clean files before merging")
         #Drop duplicates if user wants
         st.markdown("**Deaaling with duplicates**")
-        with st.expander("Duplicate rows in File 1"):
+        with st.expander("Duplicate rows in File 1 and File 2"):
             df1_dup = df1.duplicated()
             st.write(df1[df1_dup].head(10))
-        with st.expander("Duplicate rows in File 2"):
             df2_dup = df2.duplicated()
             st.write(df2[df2_dup].head(10))
 
