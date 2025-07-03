@@ -29,7 +29,7 @@ def analyze_file(df,label = "File"):
     tab1a,tab2a = st.tabs(["Drop Nulls", "Replace Nulls"])
     with tab1a:
         st.subheader(f"Drop Rows in {label} with Nulls")
-        drop_cols_df = st.multiselect("Select columns to DROP rows with missing values:",df.columns.tolist())
+        drop_cols_df = st.multiselect("Select columns to DROP rows with missing values:",df.columns.tolist(),key = "drop_col_{label}")
         if drop_cols_df:
             before = df.shape[0]
             df = df.dropna(subset = drop_cols_df)
@@ -37,7 +37,7 @@ def analyze_file(df,label = "File"):
             st.warning(f"{before - after} rows droped in {label} due to nulls in selected columns.")
     with tab2a:
         st.subheader("Replace Missing Values")
-        replace_cols_df = st.multiselect(f"Select columns to REPLACE missing values in - {label}:", df.columns.tolist())
+        replace_cols_df = st.multiselect(f"Select columns to REPLACE missing values in - {label}:", df.columns.tolist(),key ="replace_col_{label}")
         if replace_cols_df:
             strategy = st.selectbox("Choose a replacement strategy:",["Replace with 0", "Replace with Custom Text", "Replace with Mean", "Replace with Median","Replace with Mode"]
                                     )
@@ -48,7 +48,7 @@ def analyze_file(df,label = "File"):
                 custom_value_df = st.text_input("Enter the custom value to use:")
                 if custom_value_df:
                     df[replace_cols_df] = df[replace_cols_df].fillna(custom_value_df)
-                    st.success(f"Nulls replaced with '{custom_value_df1}' in {label}.")
+                    st.success(f"Nulls replaced with '{custom_value_df}' in {label}.")
             elif strategy in ["Replace with Mean", "Replace with Median", "Replace with Mode"]:
                 skipped = []
                 for col in replace_cols_df:
@@ -76,15 +76,15 @@ def analyze_file(df,label = "File"):
     #Group by function
     st.subheader(f"Analytics for {label}")
     with st.expander(f"Groupby Analytics for {label}"):
-        grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns, key = "gr_col")
-        grp_aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"],key = "gr_ag")
+        grpby_col = st.multiselect(f"Select column(s) to group by in {label}", df.columns, key = "gr_col_{label}")
+        grp_aggf = st.multiselect(f"Select aggregatation function in {label}",["mean", "sum", "count","min", "max"],key = "gr_ag_{label}")
     #Select only numeric columns
         numeric_cols = df.select_dtypes(include = "number").columns
         selected_cols = []
         if len(numeric_cols) == 0:
             st.warning(f"No numeric columns available for aggregation in {label}.")
         elif grpby_col:
-            selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols),key = "gr_sel_cl")
+            selected_cols = st.multiselect(f"Select numeric columns to aggregate in {label}", numeric_cols, default = list(numeric_cols),key = "gr_sel_cl_{label}")
         if selected_cols and grp_aggf and grpby_col:
             try:
                 grouped_df = df.groupby(grpby_col)[selected_cols].agg(grp_aggf)
@@ -101,9 +101,9 @@ def analyze_file(df,label = "File"):
 
 
     with st.expander(f"Pivot Table for{label}"):
-        pv_idx_col = st.multiselect(f"Select columns to use as index in {label}",df.columns, key = "pv_id_cl")
-        pv_col = st.multiselect(f"Select columns to split horizontally in {label}",df.columns, key = "pv_cl")
-        pv_aggf = st.multiselect(f"Select an aggregate function to aggrgate in {label}",["mean","sum","count","min","max"], key = "pv_n_cl")
+        pv_idx_col = st.multiselect(f"Select columns to use as index in {label}",df.columns, key = "pv_id_{label}")
+        pv_col = st.multiselect(f"Select columns to split horizontally in {label}",df.columns, key = "pv_cl_{label}")
+        pv_aggf = st.multiselect(f"Select an aggregate function to aggrgate in {label}",["mean","sum","count","min","max"], key = "pv_n_cl_{label}")
         pv_numeric_val = df.select_dtypes(include = "number").columns
         if len(pv_numeric_val) == 0:
             st.warning(f"No numeric columns availlable for aggregation in {label}.") 
