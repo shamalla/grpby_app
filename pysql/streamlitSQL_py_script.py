@@ -9,8 +9,8 @@ st.set_page_config(page_title = "SQL Server Dashboard")
 st.title("SQL Server Data viewer")
 
 server = st.text_input("SQL Server",value = "your_server_name")
-database = st.text_input("Database", value = "Database_name")
-user_name = st.text_input("User_name", value = "Your user_name")
+database = st.text_input("Database", value = "database_name")
+user_name = st.text_input("User_name", value = "your user_name")
 password = st.text_inpute("Password", type = "password")
 
 
@@ -38,7 +38,7 @@ if st.button("Connect and load your Data"):
         if not df.empty:
             st.subheader("Plot options")
         #Selecting numeric columns to use for plotting
-            numeric_columns = st.select_dtypes(include["number"]).column_tolist()
+            numeric_columns = st.select_dtypes(include = ["number"]).column_tolist()
             all_columns = df.columns.to_list()
 
             x_cols = st.selectbox("Select X_axis columns", all_columns)
