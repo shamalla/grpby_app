@@ -9,7 +9,7 @@ st.set_page_config(page_title = "SQL Server Dashboard")
 st.title("SQL Server Data viewer")
 
 server=st.text_input("SQL Server",value="localhost")
-database=st.text_input("Database",value="YourDatabase")
+database=st.text_input("Database",value="Covid_19")
 #user_name = st.text_input("User_name", value = "your user_name")
 #password = st.text_input("Password", type = "password")
 
