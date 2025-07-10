@@ -8,8 +8,8 @@ import plotly.express as px
 st.set_page_config(page_title = "SQL Server Dashboard")
 st.title("SQL Server Data viewer")
 
-server = st.text_input("SQL Server",value = "your_server_name")
-database = st.text_input("Database", value = "database_name")
+server = st.text_input("SQL Server",value="localhost")
+database = st.text_input("Database",value="database_name")
 #user_name = st.text_input("User_name", value = "your user_name")
 #password = st.text_input("Password", type = "password")
 
