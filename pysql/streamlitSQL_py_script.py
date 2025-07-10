@@ -19,7 +19,7 @@ if st.button("Connect and load your Data"):
     try:
         conn = pyodbc.connect(
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={server};"
+            f"SERVER=127.0.0.1,1433;"
             f"DATABASE={database};"
             f"Trusted_Connection=yes;"
             #f"UID={user_name};"
