@@ -18,10 +18,10 @@ password = st.text_input("Password", type = "password")
 if st.button("Connect and load your Data"):
     try:
         conn = pyodbc.connect(
-            f"DRIVER = {{ODBC Driver 17 for SQL Server}}"
-            f"SERVER = {server}"
-            f"DATABASE = {database}"
-            f"USER_NAME = {user_name}"
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER = {server};"
+            f"DATABASE = {database};"
+            f"USER_NAME = {user_name};"
             f"PASSWORD = {password}"
         )
 
