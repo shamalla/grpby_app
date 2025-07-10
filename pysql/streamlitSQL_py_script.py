@@ -10,8 +10,8 @@ st.title("SQL Server Data viewer")
 
 server = st.text_input("SQL Server",value = "your_server_name")
 database = st.text_input("Database", value = "database_name")
-user_name = st.text_input("User_name", value = "your user_name")
-password = st.text_input("Password", type = "password")
+#user_name = st.text_input("User_name", value = "your user_name")
+#password = st.text_input("Password", type = "password")
 
 
 #A button is placed so that the app can only run if the credentials have been entrered
@@ -21,8 +21,9 @@ if st.button("Connect and load your Data"):
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
             f"SERVER={server};"
             f"DATABASE={database};"
-            f"UID={user_name};"
-            f"PWD={password}"
+            f"Trusted_Connection=yes;"
+            #f"UID={user_name};"
+            #f"PWD={password}"
         )
 
         #sql query to load the data
