@@ -41,8 +41,8 @@ if st.button("Connect and load your Data"):
         if not df.empty:
             st.subheader("Plot options")
         #Selecting numeric columns to use for plotting
-            numeric_columns = st.select_dtypes(include = ["number"]).column_tolist()
-            all_columns = df.columns.to_list()
+            numeric_columns = df.select_dtypes(include = ["number"]).columns.tolist()
+            all_columns = df.columns.tolist()
 
             x_cols = st.selectbox("Select X_axis columns", all_columns)
             y_cols = st.selectbox("Select Y_axis columns", numeric_columns)
