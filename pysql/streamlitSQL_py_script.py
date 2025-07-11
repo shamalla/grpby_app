@@ -9,9 +9,11 @@ st.set_page_config(page_title = "SQL Server Dashboard")
 st.title("SQL Server Data viewer")
 
 server=st.text_input("SQL Server",value="localhost")
-database=st.text_input("Database",value="Covid_19")
+database=st.text_input("Database",value="Your_database_name")
 #user_name = st.text_input("User_name", value = "your user_name")
 #password = st.text_input("Password", type = "password")
+#st.write("Connecting to server:", server)
+#st.write("Database:", database)
 
 
 #A button is placed so that the app can only run if the credentials have been entrered
