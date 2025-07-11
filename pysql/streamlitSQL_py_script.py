@@ -61,11 +61,11 @@ if "df" in st.session_state:
             if chart_type == "Line":
                 fig = px.line(df, x=x_cols, y=y_cols, title=f"{y_cols} vs {x_cols}")
             elif chart_type == "Bar":
-                fig = px.bar(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
-            elif chart_type == "scatter":
-                fig = px.scatter(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
+                fig = px.Bar(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
+            elif chart_type == "Scatter":
+                fig = px.Scatter(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
             elif chart_type == "Histogram":
-                fig = px.histogram(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
+                fig = px.Histogram(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
             st.plotly_chart(fig,use_container_width = True)
         else:
             st.warning("Please select both X and Y labels to plot.")
