@@ -31,16 +31,16 @@ if source == "Upload your files":
 #upload using sql server
 elif source == "Connect to SQL":
     st.markdown("### Enter SQL server credentials")
-    server = st.tex_input("Server", value = "your_server_name")
-    database = st.text_input("Database", value = "database_name")
-    user_name = st.text_input("User Name", value = "your_user_name")
-    password = st.text_input("Password", type = "password")
+    server=st.text_input("Server", value="your_server_name")
+    database=st.text_input("Database", value="database_name")
+    user_name=st.text_input("User Name", value="your_user_name")
+    password=st.text_input("Password", type="password")
     if st.button("Connect"):
         try:
             conn = pyodbc.connect(
             f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER = {server};DATABASE={database};UID={user_name},PWD={password}")
-            st.success("Connected to SQL server")
+            f"SERVER={server};DATABASE={database};UID={user_name};PWD={password}")
+            st.success(f"Connected to SQL server.")
 
         #show availlable databases
             table_df = pd.read_sql("SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS table_full_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'",conn)
