@@ -28,38 +28,46 @@ if st.button("Connect and load your Data"):
             #f"PWD={password}"
         )
         st.success("connection is successfully")
+        #We want to keep the state of our connection
+        st.session_state["conn"]=conn
         #sql query to load the data
         query = st.text_area("Enter SQL Query", "SELECT TOP 100 * FROM your_table")
 
         #Load the data from our question
         df = pd.read_sql(query,conn)
+        st.session_state["df"]=df
         st.success("Your data has been loaded successfully")
+    except Exception as {e}:
+        st.error(f"connection error or query failure\n{e}")
+
+if "df" in st.session_state:
+        df = st.session_state["df"]             
 
         with st.expander("View your data"):
             st.dataframe(df)
 
-        if not df.empty:
-            st.subheader("Plot options")
+        #if not df.empty:
+        st.subheader("Plot options")
         #Selecting numeric columns to use for plotting
-            numeric_columns = df.select_dtypes(include = ["number"]).columns.tolist()
-            all_columns = df.columns.tolist()
+        numeric_columns = df.select_dtypes(include = ["number"]).columns.tolist()
+        all_columns = df.columns.tolist()
 
-            x_cols = st.selectbox("Select X_axis columns", all_columns)
-            y_cols = st.selectbox("Select Y_axis columns", numeric_columns)
+        x_cols = st.selectbox("Select X_axis columns", all_columns)
+        y_cols = st.selectbox("Select Y_axis columns", numeric_columns)
 
-            chart_type = st.radio("Select Chart type",["Line","Bar","Scatter","Histogram"])
+        chart_type = st.radio("Select Chart type",["Line","Bar","Scatter","Histogram"])
 
-            if x_cols and y_cols:
-                if chart_type == "Line":
-                    fig = px.line(df, x=x_cols, y=y_cols, title=f"{y_cols} vs {x_cols}")
-                elif chart_type == "Bar":
-                    fig = px.bar(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
-                elif chart_type == "scatter":
-                    fig = px.scatter(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
-                elif chart_type == "Histogram":
-                    fig = px.histogram(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
-                st.plotly_chart(fig,use_container_width = True)
-            else:
-                st.warning("Please select both X and Y labels to plot.")
-    except Exception as e:
-        st.error(f"connection error or query failure\n{e}")    
+        if x_cols and y_cols:
+            if chart_type == "Line":
+                fig = px.line(df, x=x_cols, y=y_cols, title=f"{y_cols} vs {x_cols}")
+            elif chart_type == "Bar":
+                fig = px.bar(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
+            elif chart_type == "scatter":
+                fig = px.scatter(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
+            elif chart_type == "Histogram":
+                fig = px.histogram(df, x = x_cols, y = y_cols, title = f"{y_cols} vs{x_cols}")
+            st.plotly_chart(fig,use_container_width = True)
+        else:
+            st.warning("Please select both X and Y labels to plot.")
+    #except Exception as e:
+        #st.error(f"connection error or query failure\n{e}")    
