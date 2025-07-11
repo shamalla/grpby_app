@@ -37,7 +37,7 @@ if st.button("Connect and load your Data"):
         df = pd.read_sql(query,conn)
         st.session_state["df"]=df
         st.success("Your data has been loaded successfully")
-    except Exception as {e}:
+    except Exception as e:
         st.error(f"connection error or query failure\n{e}")
 
 if "df" in st.session_state:
