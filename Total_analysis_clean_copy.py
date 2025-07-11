@@ -3,43 +3,64 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 from helper import analyze_file
+import pyodbc
 
 st.title = ("Total Analytics")
 st.subheader(f"Karibu. Welcome. Bienvenue... Please upload your file(s).")
-st.markdown("**Note:** Please ensure the first row of your file contains the column headers before uploading.")
-file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","csv"], key = "file1")
-file2 = st.file_uploader("Upload your file (optional)", type = ["xlsx","xlx","csv"], key = "file2")
+st.subheader("Please choose an option to upload your data:")
+source = st.radio("Select data source:",["Upload your files", "Connect to SQL"])
 df1 , df2 = None, None
+if source == "Upload your files":
+    st.markdown("**Note:** Please ensure the first row of your file contains the column headers before uploading.")
+    file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","csv"], key = "file1")
+    file2 = st.file_uploader("Upload your file (optional)", type = ["xlsx","xlx","csv"], key = "file2")
+    #Loaded files
+    if file1 :
+        xls1 = pd.ExcelFile(file1)
+        sheet_names1 = xls1.sheet_names
+        selected_sheet1 = st.selectbox("Select sheet to analyze for File 1", sheet_names1, key = "f1")
+        df1 = pd.read_excel(file1, sheet_name=selected_sheet1,header=0) if file1.name.endswith("xlsx") else pd.read_csv(file1,header=0)
+        st.success(f"Loaded: {selected_sheet1} from File 1")
+    if file2:
+        xls2 = pd.ExcelFile(file2)
+        sheet_names2 = xls2.sheet_names
+        selected_sheet2 = st.selectbox("Select sheet to analyze for File 2", sheet_names2,key = "f2")
+        df2 = pd.read_excel(file2, sheet_name=selected_sheet2,header=0) if file2.name.endswith("xlsx") else pd.read_csv(file2,header=0)
+        st.success(f"Loaded: {selected_sheet2} from File 2")
 
-#---optional: Let the user select which row to use as header---
-#st.markdown("(Experimental) Choose which row to use as column header:")
-#header_row = st.number_input("Row number(starting from 0)",min_value = 0,step=1,value=0)
-# if file1:
-#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1, header=header_row)
-# if file2:
-#     df2 = pd.read_excel(file2, sheet_name=selected_sheet2, header=header_row)
+#upload using sql server
+elif source == "Connect to SQL":
+    st.markdown("### Enter SQL server credentials")
+    server = st.tex_input("Server", value = "your_server_name")
+    database = st.text_input("Database", value = "database_name")
+    user_name = st.text_input("User Name", value = "your_user_name")
+    password = st.text_input("Password", type = "password")
+    if st.button("Connect"):
+        try:
+            conn = pyodbc.connect(
+            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+            f"SERVER = {server};DATABASE={database};UID={user_name},PWD={password}")
+            st.success("Connected to SQL server")
 
-#option2
-#select_custom_header = st.checkbox("Manually select header row",value = False)
-# if use_custom_header:
-#     header_row = st.number_input("Select header row index (0-based)", min_value=0, value=0)
-#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1, header=header_row)
-# else:
-#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1)
+        #show availlable databases
+            table_df = pd.read_sql("SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS table_full_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'",conn)
+            with st.expander("Tables availlable"):
+                st.dataframe(table_df)
 
-#Loaded files
-if file1 :
-    xls1 = pd.ExcelFile(file1)
-    sheet_names1 = xls1.sheet_names
-    selected_sheet1 = st.selectbox("Select sheet to analyze for File 1", sheet_names1, key = "f1")
-    df1 = pd.read_excel(file1, sheet_name=selected_sheet1,header=0) if file1.name.endswith("xlsx") else pd.read_csv(file1,header=0)
-    st.success(f"Loaded: {selected_sheet1} from File 1")
-if file2:
-    xls2 = pd.ExcelFile(file2)
-    sheet_names2 = xls2.sheet_names
-    selected_sheet2 = st.selectbox("Select sheet to analyze for File 2", sheet_names2,key = "f2")
-    df2 = pd.read_excel(file2, sheet_name=selected_sheet2,header=0) if file2.name.endswith("xlsx") else pd.read_csv(file2,header=0)
-    st.success(f"Loaded: {selected_sheet2} from File 2")
+        #Loading SQL querries    
+            st.markdown("### Enter SQL querry ")
+            sql_querry1 = st.text_area("SQL Query 1", height=200, key="q1", placeholder="e.g. SELECT * FROM dbo.kranium")
+            df1 = pd.read_sql(sql_querry1,conn)
+            st.success(f"Querry 1 has been executed successfully!")
+            st.dataframe(df1.head(5),key = "sq1")
+
+            sql_querry2 = st.text_area("SQL Query 2", height=200, key="q2", placeholder="e.g. SELECT * FROM dbo.navision")
+            df2 = pd.read_sql(sql_querry2,conn)
+            st.success(f"Querry 2 has been executed successfully!")
+            st.dataframe(df1.head(5),key = "sql2")
+        except Exception as e:
+            st.error(f"connection or querry failed:\n{e}")
+
 if df1 is not None:
     options = ["Analyze File 1 only"]
     if df2 is not None:
