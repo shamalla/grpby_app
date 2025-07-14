@@ -5,3 +5,7 @@ numpy
 matplotlib
 pyodbc
 plotly
+pyodbc #for SQL Server
+pymysql #for MySQL
+psycopg2 #for PostgreSQL
+sqlite3 #for SQLite

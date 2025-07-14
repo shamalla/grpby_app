@@ -334,7 +334,21 @@ else:
         
 
 
+#---optional: Let the user select which row to use as header---
+#st.markdown("(Experimental) Choose which row to use as column header:")
+#header_row = st.number_input("Row number(starting from 0)",min_value = 0,step=1,value=0)
+# if file1:
+#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1, header=header_row)
+# if file2:
+#     df2 = pd.read_excel(file2, sheet_name=selected_sheet2, header=header_row)
 
+#option2
+#select_custom_header = st.checkbox("Manually select header row",value = False)
+# if use_custom_header:
+#     header_row = st.number_input("Select header row index (0-based)", min_value=0, value=0)
+#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1, header=header_row)
+# else:
+#     df1 = pd.read_excel(file1, sheet_name=selected_sheet1)
     
 
     

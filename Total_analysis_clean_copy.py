@@ -3,7 +3,12 @@ import numpy as np
 import streamlit as st
 import matplotlib.pyplot as plt
 from helper import analyze_file
-import pyodbc
+
+#Database servers
+import pyodbc #for SQL Server
+import pymysql #for MySQL
+import psycopg2 #for PostgreSQL
+import sqlite3 #for SQLite
 
 st.title = ("Total Analytics")
 st.subheader(f"Karibu. Welcome. Bienvenue... Please upload your file(s).")
@@ -29,19 +34,65 @@ if source == "Upload your files":
         st.success(f"Loaded: {selected_sheet2} from File 2")
 
 #upload using sql server
-elif source == "Connect to SQL":
-    st.markdown("### Enter SQL server credentials")
-    server=st.text_input("Server", value="your_server_name")
-    database=st.text_input("Database", value="database_name")
-    user_name=st.text_input("User Name", value="your_user_name")
-    password=st.text_input("Password", type="password")
+elif source == "Connect to Server":
+    db_type=("Choose your database",["SQL Server","MySQL","PostgreSQL","SQLite"])
+    st.markdown("### Enter server credentials")
+    if db_type == "SQL Server":
+        server=st.text_input("Server", value="your_server_name")
+        database=st.text_input("Database", value="database_name")
+        auth_method = st.radio("Authentication",["Windows","Username/Password"])
+        if auth_method == "Username/Password":
+            user_name=st.text_input("User Name", value="your_user_name")
+            password=st.text_input("Password", type="password")
+
+    elif db_type == "MySQL" or db_type == "PostgreSQL":
+        host=st.text_input("Host",value="localhost")
+        port=st.number_input("Port",value=3306 if db_type == "MySQL" else 5432)
+        database=st.text_input("Database name")#(value="your_database_name")
+        username=st.text_input("Username") 
+        password=st.text_input("Password",type="password")
+
+    elif db_type == "SQLite":
+        db_file = st.text_input("SQLite file path(eg./path/to/db.sqlite3)")
+
+    conn = None 
     if st.button("Connect"):
         try:
-            conn = pyodbc.connect(
-            f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-            f"SERVER={server};DATABASE={database};UID={user_name};PWD={password}")
-            st.success(f"Connected to SQL server.")
+            if db_type == "SQL Server":
+                if auth_method == "Windows":
+                    conn = pyodbc.connect(
+                        f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+                        f"SERVER={server};DATABASE={database};"
+                        f"Trusted_Connection=yes;")
+                else:
+                    conn=pyodbc.connect(
+                        f"DRIVER={{ODBC Driver 17 for SQL Server}};"
+                        f"SERVER={server};DATABESE={database};"
+                        f"UID={user_name};PWD={password}"
+                )
+            elif db_type == "MySQL":
+                conn=pymysql.connect(
+                    host=host,
+                    port=int(port),
+                    user=username,
+                    password=password,
+                    database=database
+                )    
 
+            elif db_type == "PostgreSQL":
+                conn=psycopg2.connect(
+                    host=host
+                    port=int(port)
+                    user=username,
+                    password=password
+                    dbname=database
+                )  
+
+            elif db_type == "SQLite":
+                conn=sqlite3.connect(db_file)            
+            st.success(f"Connected to SQL server.")
+        except Exception as e:
+            st.error(f"Connection failed:\n{e}")    
         #show availlable databases
             table_df = pd.read_sql("SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS table_full_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'",conn)
             with st.expander("Tables availlable"):
