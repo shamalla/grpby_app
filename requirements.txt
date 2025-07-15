@@ -7,5 +7,5 @@ pyodbc
 plotly
 pyodbc 
 pymysql 
-psycopg2 
+psycopg2-binary 
 sqlite3 
