@@ -10,11 +10,25 @@ import pymysql #for MySQL
 import psycopg2 #for PostgreSQL
 import sqlite3 #for SQLite
 
-st.title = ("Total Analytics")
+#A reset button that the user can press if he wants to clear his/her working and upload something else
+st.set_page_config(page_title = "Total Analytics", layout ="wide")
+if st.sidebar.button("Reset App"):
+    for key in list(st.session_state.keys()):
+        del st.session_state[key]
+    st.experimental_rerun()    
+
+#Making sure our dataframes is in a session state not being stored locally so that even if any button is clicked it still remains
+df1=st.session_state.get("df1",None)
+df2=st.session_state.get("df2",None)
+conn = st.session_state.get("conn", None)
+connected = st.session_state.get("connected", False)
+
+#Introduction to the user interface.
+st.title("Total Analytics")
 st.subheader(f"Karibu. Welcome. Bienvenue... Please upload your file(s).")
 st.subheader("Please choose an option to upload your data:")
-source = st.radio("Select data source:",["Upload your files", "Connect to SQL"])
-df1 , df2 = None, None
+source = st.radio("Select data source:",["Upload your files", "Connect to Server"])
+#df1 , df2 = None, None
 if source == "Upload your files":
     st.markdown("**Note:** Please ensure the first row of your file contains the column headers before uploading.")
     file1 = st.file_uploader("Upload file 1(Required)", type = ["xlsx","xlx","csv"], key = "file1")
@@ -25,17 +39,26 @@ if source == "Upload your files":
         sheet_names1 = xls1.sheet_names
         selected_sheet1 = st.selectbox("Select sheet to analyze for File 1", sheet_names1, key = "f1")
         df1 = pd.read_excel(file1, sheet_name=selected_sheet1,header=0) if file1.name.endswith("xlsx") else pd.read_csv(file1,header=0)
+        st.session_state.df1=df1
         st.success(f"Loaded: {selected_sheet1} from File 1")
     if file2:
         xls2 = pd.ExcelFile(file2)
         sheet_names2 = xls2.sheet_names
         selected_sheet2 = st.selectbox("Select sheet to analyze for File 2", sheet_names2,key = "f2")
         df2 = pd.read_excel(file2, sheet_name=selected_sheet2,header=0) if file2.name.endswith("xlsx") else pd.read_csv(file2,header=0)
+        st.session_state.df2=df2
         st.success(f"Loaded: {selected_sheet2} from File 2")
 
+#adding a connection so that the connection can be in static
+if "conn" not in st.session_state:
+    st.session_state.conn = None
+
+if "connected" not in st.session_state:
+    st.session_state.connected = False    
 #upload using sql server
 elif source == "Connect to Server":
-    db_type=("Choose your database",["SQL Server","MySQL","PostgreSQL","SQLite"])
+    db_type=st.selectbox("Choose your database",["SQL Server","MySQL","PostgreSQL","SQLite"])
+    st.session_state.db_type=db_type
     st.markdown("### Enter server credentials")
     if db_type == "SQL Server":
         server=st.text_input("Server", value="your_server_name")
@@ -55,8 +78,7 @@ elif source == "Connect to Server":
     elif db_type == "SQLite":
         db_file = st.text_input("SQLite file path(eg./path/to/db.sqlite3)")
 
-    conn = None 
-    if st.button("Connect"):
+    if st.button("Connect",key = "ConDb"):
         try:
             if db_type == "SQL Server":
                 if auth_method == "Windows":
@@ -67,7 +89,7 @@ elif source == "Connect to Server":
                 else:
                     conn=pyodbc.connect(
                         f"DRIVER={{ODBC Driver 17 for SQL Server}};"
-                        f"SERVER={server};DATABESE={database};"
+                        f"SERVER={server};DATABASE={database};"
                         f"UID={user_name};PWD={password}"
                 )
             elif db_type == "MySQL":
@@ -81,36 +103,90 @@ elif source == "Connect to Server":
 
             elif db_type == "PostgreSQL":
                 conn=psycopg2.connect(
-                    host=host
-                    port=int(port)
+                    host=host,
+                    port=int(port),
                     user=username,
-                    password=password
+                    password=password,
                     dbname=database
                 )  
 
             elif db_type == "SQLite":
                 conn=sqlite3.connect(db_file)            
+
+            st.session_state.conn = conn
+            st.session_state.connected = True
             st.success(f"Connected to SQL server.")
-        except Exception as e:
-            st.error(f"Connection failed:\n{e}")    
-        #show availlable databases
-            table_df = pd.read_sql("SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS table_full_name FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE = 'BASE TABLE'",conn)
-            with st.expander("Tables availlable"):
-                st.dataframe(table_df)
 
-        #Loading SQL querries    
-            st.markdown("### Enter SQL querry ")
-            sql_querry1 = st.text_area("SQL Query 1", height=200, key="q1", placeholder="e.g. SELECT * FROM dbo.kranium")
-            df1 = pd.read_sql(sql_querry1,conn)
-            st.success(f"Querry 1 has been executed successfully!")
-            st.dataframe(df1.head(5),key = "sq1")
+           
+        #show availlable Tables
+            if st.session_state.connected and st.session_state.conn:
+                conn = st.session_state.conn
+                db_type = st.session_state.db_type
+                try:
+                    if db_type == "SQL Server":
+                        table_query= """
+                        SELECT TABLE_SCHEMA + '.' + TABLE_NAME AS table_full_name 
+                        FROM INFORMATION_SCHEMA.TABLES 
+                        WHERE TABLE_TYPE = 'BASE TABLE'
+                        """
+                        
 
-            sql_querry2 = st.text_area("SQL Query 2", height=200, key="q2", placeholder="e.g. SELECT * FROM dbo.navision")
-            df2 = pd.read_sql(sql_querry2,conn)
-            st.success(f"Querry 2 has been executed successfully!")
-            st.dataframe(df1.head(5),key = "sql2")
+                    elif db_type == "MySQL":
+                        table_query = f"""
+                        SELECT table_schema, table_name 
+                        FROM information_schema.tables 
+                        WHERE table_type = 'BASE TABLE' AND table_schema = '{database}'
+                        """
+
+                    elif db_type == "PostgreSQL":
+                        table_query = """
+                        SELECT table_schema || '.' || table_name AS table_full_name 
+                        FROM information_schema.tables 
+                        WHERE table_type = 'BASE TABLE' AND table_schema NOT IN ('pg_catalog', 'information_schema')
+                        """
+
+                    elif db_type == "SQLite":
+                        table_query = """
+                        SELECT name AS table_name FROM sqlite_master WHERE type = 'table';
+                        """   
+                    sqltable_df=pd.read_sql(table_query,conn)
+                    with st.expander("Tables availlable"):
+                        st.dataframe(sqltable_df) 
+
+                except Exception as e:
+                    st.error("Could not retreive tables") 
         except Exception as e:
-            st.error(f"connection or querry failed:\n{e}")
+            st.error(f"connection failed:\n{e}")          
+           
+
+        #Loading SQL querries  
+    if st.session_state.connected and st.session_state.conn:
+        conn = st.session_state.conn
+        st.markdown("### Enter SQL querry ")
+        sql_querry1 = st.text_area("SQL Query 1", height=200, key="q1", placeholder="e.g. SELECT * FROM dbo.kranium")
+        if st.button("Run SQL query 1",key = "Rq1"):
+            try:
+                df1 = pd.read_sql(sql_querry1,conn)
+                st.session_state.df1=df1
+                st.success(f"Querry 1 has been executed successfully!")
+                st.dataframe(df1.head(5),key = "sq1")
+            except Exception as e:
+                st.error(f"Querry 1 failled:{e}")
+
+        sql_querry2 = st.text_area("SQL Query 2", height=200, key="q2", placeholder="e.g. SELECT * FROM dbo.navision")
+        if st.button("Run SQL query 2",key ="Rq2"):
+            try:
+                df2 = pd.read_sql(sql_querry2,conn)
+                st.session_state.df2=df2
+                st.success(f"Querry 2 has been executed successfully!")
+                st.dataframe(df2.head(5),key = "sql2")
+            except Exception as e:
+                st.error(f"Querry 2 failled.")
+
+    else:
+        st.warning("Please connect to the database first")        
+
+        
 
 if df1 is not None:
     options = ["Analyze File 1 only"]
@@ -191,12 +267,16 @@ if df1 is not None:
                         pv_table_df1 = df1.pivot_table(index =pv_idx_df1 ,columns = pv_col_df1 if pv_col_df1 else None,values= pv_values_df1,aggfunc = pv_aggf_df1, fill_value = 0)
                         pv_table_df1.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table_df1.columns]
                         pv_table_df1.reset_index(inplace = True)
-                        with st.expander(f"Review your File 1 pivot table"):
-                            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "pv_df1" )
-                            st.dataframe(pv_table_df1)   
-                            st.write(f"Pivot table shape: {pv_table_df1.shape}")
                     except Exception as e:
                         st.error(f"Error during pivot_tabling in File 1: {e}")
+
+            if 'pv_table_df1' in st.session_state:
+                with st.expander(f"Review your File 1 pivot table"):  
+                    pv_table_df1 = st.session_state.pv_table_df1          
+                    num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "pv_df1" )
+                    st.dataframe(pv_table_df1)   
+                    st.write(f"Pivot table shape: {pv_table_df1.shape}")
+                    
 
             st.markdown("### Pivot Table for File 2")
             with st.expander("Create Pivot Table for File 2"):
@@ -214,12 +294,16 @@ if df1 is not None:
                         pv_table_df2 = df2.pivot_table(index =pv_idx_df2 ,columns = pv_col_df2 if pv_col_df2 else None,values= pv_values_df2,aggfunc = pv_aggf_df2, fill_value = 0)
                         pv_table_df2.columns = ['_'.join(map(str, col)).strip() if isinstance(col, tuple) else col for col in pv_table_df2.columns]
                         pv_table_df2.reset_index(inplace = True)
-                        with st.expander(f"Review your File 2 pivot table"):
-                            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10, key = "pv_df2" )
-                            st.dataframe(pv_table_df2)   
-                            st.write(f"Pivot table shape: {pv_table_df2.shape}")
                     except Exception as e:
-                        st.error(f"Error during pivot_tabling in File 2: {e}")  
+                        st.error(f"Error during pivot_tabling in File 2: {e}") 
+
+            if 'pv_table_df2' in st.session_state:
+                with st.expander(f"Review your File 2 pivot table"):          
+                    pv_table_df2 = st.session_state.pv_table_df2    
+                    num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10, key = "pv_df2" )
+                    st.dataframe(pv_table_df2)   
+                    st.write(f"Pivot table shape: {pv_table_df2.shape}")
+                     
 
             
         st.subheader("Reconciliation analysis")
@@ -295,59 +379,63 @@ if df1 is not None:
             with st.expander("Rows from both files"):
                 st.write(f"Shape:{both_files.shape}")
                 st.dataframe(both_files.head())
+            if 'both_files' in locals():
                 with st.expander("Summary of Both rows"):
                     st.write(both_files.describe(include = "all"))
 
                     #result_df = both_files.copy()
-                with st.expander("Add or subtract Two numeric columns"):
-                    numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
-                    all_columns = both_files.columns.tolist()
+            
+            with st.expander("Add or subtract Two numeric columns"):
+                numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
+                all_columns = both_files.columns.tolist()
                     
-                    if len(numeric_columns) < 2:
-                        st.warning("Need atleast two numeric columns to add or subtract.")
+                if len(numeric_columns) < 2:
+                    st.warning("Need atleast two numeric columns to add or subtract.")
 
-                    else:
-                        col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
-                        col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
+                else:
+                    col1 = st.selectbox("Select first column", numeric_columns,key = "arith_col1")
+                    col2 = st.selectbox("Select second column", numeric_columns, key = "arith_col2")
 
-                        id_column_option = [col for col in all_columns if col not in [col1,col2]]
-                        id_col = st.selectbox("select an identifier column to include", id_column_option, key= "id_col")
-                        operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
+                    id_column_option = [col for col in all_columns if col not in [col1,col2]]
+                    id_col = st.selectbox("select an identifier column to include", id_column_option, key= "id_col")
+                    operation = st.radio("Choose operation",["Add","Subtract"], key = "arith_oper")
 
                             #merge_key_col = merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
-                        selected_columns = [id_col,col1,col2]     
-                        result_df = both_files[selected_columns].copy()
+                    selected_columns = [id_col,col1,col2]     
+                    result_df = both_files[selected_columns].copy()
                             #possible_merge_cols = [merge_col_df1, merge_col_df2, f"{merge_col_df1}_fl1", f"{merge_col_df2}_fl2"]
                             #merge_key_col = next((col for col in possible_merge_cols if col in both_files.columns), None)
-                        if col1 !=col2:   
+                    if col1 !=col2:   
                                 #if merge_key_col: #= merge_col_df1 if merge_col_df1 in both_files.columns else merge_col_df2
                                     #selected_columns = [merge_key_col,col1,col2]     
                                 #result_df = both_files[selected_columns].copy()  
                                 #result_df = both_files[[merge_col_df1,col1,col2]].copy()
                                 #result_df = both_files.copy()
-                            if "Result" in result_df.columns:
-                                result_df.drop(columns =["Result"], inplace=True)
-                            if operation == "Add":
-                                result_df["Result"] = result_df[col1] + result_df[col2]
-                                st.success(f"Successfully added:{col1} + {col2}")
-                            else:
-                                result_df["Result"] = result_df[col1] - result_df[col2]
-                                st.success(f"Successfully subtracted:{col1} - {col2}")
+                        if "Result" in result_df.columns:
+                            result_df.drop(columns =["Result"], inplace=True)
+                        if operation == "Add":
+                            result_df["Result"] = result_df[col1] + result_df[col2]
+                            st.success(f"Successfully added:{col1} + {col2}")
+                        else:
+                            result_df["Result"] = result_df[col1] - result_df[col2]
+                            st.success(f"Successfully subtracted:{col1} - {col2}")
 
-                            num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
-                            st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
-                            with st.expander("Summary of the Result"):
-                                st.write(result_df.describe(include="all"))
+                        num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
+                        st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
+            
+            with st.expander("Summary of the Result"):
+                st.write(result_df.describe(include="all"))
 
-                            between_df_files = result_df[result_df["Result"].between(-10 , 10)]
-                            outside_result = result_df[~result_df["Result"].between(-10 , 10)]              
-                            with st.expander(f"Data from both Files that reconciliation is between (-10 and 10)"):
-                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key ="preview_between" )
-                                st.dataframe(between_df_files[[id_col, col1, col2,"Result"]].head(num_rows))
+            with st.expander(f"Data from both Files that reconciliation is between (-10 and 10)"):
+                between_df_files = result_df[result_df["Result"].between(-10 , 10)]
+                outside_result = result_df[~result_df["Result"].between(-10 , 10)]              
+                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key ="preview_between" )
+                st.dataframe(between_df_files[[id_col, col1, col2,"Result"]].head(num_rows))
 
-                            with st.expander(f"Data from both Files that reconcilliation is greater than (-10 and 10)"):
-                                num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "preview_outside" )
-                                st.dataframe(outside_result[[id_col,col1,col2,"Result"]].head(num_rows))                
+            
+            with st.expander(f"Data from both Files that reconcilliation is greater than (-10 and 10)"):
+                    num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "preview_outside" )
+                    st.dataframe(outside_result[[id_col,col1,col2,"Result"]].head(num_rows))                
 
                                     #with st.expander("Preview of Result"):
                                         #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
@@ -356,14 +444,16 @@ if df1 is not None:
             with st.expander("Rows from File 1 only"):
                 st.write(f"Shape:{left_only.shape}")
                 st.dataframe(left_only.head())
-                with st.expander("Summary of files from File 1"):
+            
+            with st.expander("Summary of files from File 1"):
                     st.write(left_only.describe(include = "all"))
 
                 #Rows from right Table only
             with st.expander("Rows from File 2 only"):
                 st.write(f"Shape:{right_only.shape}")
                 st.dataframe(right_only.head())
-                with st.expander("Summary of files from File 2"):
+                
+            with st.expander("Summary of files from File 2"):
                     st.write(right_only.describe(include = "all"))
 
         except Exception as e:
