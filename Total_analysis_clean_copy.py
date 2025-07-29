@@ -1,8 +1,10 @@
 import pandas as pd
 import numpy as np
+import io
 import streamlit as st
 import matplotlib.pyplot as plt
 from helper import analyze_file
+from helper import download_reconciliation_workbook
 
 #Database servers
 import pyodbc #for SQL Server
@@ -385,7 +387,7 @@ if df1 is not None:
 
                     #result_df = both_files.copy()
             
-            with st.expander("Add or subtract Two numeric columns"):
+            with st.expander("Add or subtract to reconcile"):
                 numeric_columns = both_files.select_dtypes(include = "number").columns.tolist()
                 all_columns = both_files.columns.tolist()
                     
@@ -458,6 +460,17 @@ if df1 is not None:
 
         except Exception as e:
             st.error(f"Merger failed: {e}")
+        st.subheader("Export reconciliiation analysis")
+        download_reconciliation_workbook(
+            merged_df=merged_df,
+            both_files=both_files,
+            result_df=result_df,
+            between_df_files=between_df_files,
+            outside_result=outside_result,
+            left_only=left_only,
+            right_only=right_only,
+            filename="reconcilliation_export.xlsx"
+        )
             
 else:
     st.info("Please load your data to begin.")
