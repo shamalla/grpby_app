@@ -121,3 +121,22 @@ def analyze_file(df,label = "File"):
         else:
             st.info("Please select at least one index column,one numeric column and one aggregate function to aggregate")
     return df
+
+
+def download_reconciliation_workbook(merged_df, both_files, result_df,between_df_files,outside_result, left_only,right_only, filename="reconciliation_results.xlsx"):
+    output = io.BytesIO()
+    with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
+        merged_df.to_excel(writer, index=False, sheet_name= "Merge_file1_file2")
+        both_files.to_excel(writer,index=False, sheet_name= "Files_from_both")
+        result_df.to_excel(writer, index=False, sheet_name= "Add_sub_to_reconcile")
+        between_df_files.to_excel(writer, index=False, sheet_name= "Rec_with_diff_10")
+        outside_result.to_excel(writer, index=False, Sheet_name= "Rec_with_diff_>10")
+        left_only.to_excel(writer, index=False, sheet_name= "Files1_only")
+        right_only.to_excel(writer, index=False, sheet_name= "File2_only")
+
+    st.download_button(
+        label="Download reconciliation result as Excel",
+        data=output.getvalue(),
+        file_name=filename,
+        mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )    
