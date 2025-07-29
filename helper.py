@@ -131,7 +131,7 @@ def download_reconciliation_workbook(merged_df, both_files, result_df,between_df
         both_files.to_excel(writer,index=False, sheet_name= "Files_from_both")
         result_df.to_excel(writer, index=False, sheet_name= "Add_sub_to_reconcile")
         between_df_files.to_excel(writer, index=False, sheet_name= "Rec_with_diff_10")
-        outside_result.to_excel(writer, index=False, Sheet_name= "Rec_with_diff_>10")
+        outside_result.to_excel(writer, index=False, sheet_name= "Rec_with_diff_greater_10")
         left_only.to_excel(writer, index=False, sheet_name= "Files1_only")
         right_only.to_excel(writer, index=False, sheet_name= "File2_only")
 
