@@ -461,16 +461,7 @@ if df1 is not None:
         except Exception as e:
             st.error(f"Merger failed: {e}")
         st.subheader("Export reconciliiation analysis")
-        download_reconciliation_workbook(
-            merged_df=merged_df,
-            both_files=both_files,
-            result_df=result_df,
-            between_df_files=between_df_files,
-            outside_result=outside_result,
-            left_only=left_only,
-            right_only=right_only,
-            filename="reconcilliation_export.xlsx"
-        )
+        download_reconciliation_workbook(merged_df=merged_df, both_files=both_files,result_df=result_df,between_df_files=between_df_files,outside_result=outside_result,left_only=left_only,right_only=right_only,filename="reconcilliation_export.xlsx")
             
 else:
     st.info("Please load your data to begin.")
