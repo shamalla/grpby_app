@@ -10,7 +10,7 @@ def ensure_arrow_safe(df):
     for col in df.columns:
         if pd.api.types.is_object_dtype(df[col]) or \
             pd.api.types.is_categorical_dtype(df[col]) or \
-                pd.api.types.is_datetime64_any_dtpe(df[col]):
+                pd.api.types.is_datetime64_any_dtype(df[col]):
             df[col] = df[col].astype(str)
     return df
 
