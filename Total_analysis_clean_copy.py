@@ -5,6 +5,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from helper import analyze_file
 from helper import download_reconciliation_workbook
+from helper import safe_dataframe,safe_table
 
 #Database servers
 import pyodbc #for SQL Server
@@ -153,7 +154,7 @@ elif source == "Connect to Server":
                         """   
                     sqltable_df=pd.read_sql(table_query,conn)
                     with st.expander("Tables availlable"):
-                        st.dataframe(sqltable_df) 
+                        safe_dataframe(sqltable_df) 
 
                 except Exception as e:
                     st.error("Could not retreive tables") 
@@ -171,7 +172,7 @@ elif source == "Connect to Server":
                 df1 = pd.read_sql(sql_querry1,conn)
                 st.session_state.df1=df1
                 st.success(f"Querry 1 has been executed successfully!")
-                st.dataframe(df1.head(5),key = "sq1")
+                safe_dataframe(df1.head(5),key = "sq1")
             except Exception as e:
                 st.error(f"Querry 1 failled:{e}")
 
@@ -181,7 +182,7 @@ elif source == "Connect to Server":
                 df2 = pd.read_sql(sql_querry2,conn)
                 st.session_state.df2=df2
                 st.success(f"Querry 2 has been executed successfully!")
-                st.dataframe(df2.head(5),key = "sql2")
+                safe_dataframe(df2.head(5),key = "sql2")
             except Exception as e:
                 st.error(f"Querry 2 failled.")
 
@@ -276,7 +277,7 @@ if df1 is not None:
                 with st.expander(f"Review your File 1 pivot table"):  
                     pv_table_df1 = st.session_state.pv_table_df1          
                     num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "pv_df1" )
-                    st.dataframe(pv_table_df1)   
+                    safe_dataframe(pv_table_df1)   
                     st.write(f"Pivot table shape: {pv_table_df1.shape}")
                     
 
@@ -303,7 +304,7 @@ if df1 is not None:
                 with st.expander(f"Review your File 2 pivot table"):          
                     pv_table_df2 = st.session_state.pv_table_df2    
                     num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10, key = "pv_df2" )
-                    st.dataframe(pv_table_df2)   
+                    safe_dataframe(pv_table_df2)   
                     st.write(f"Pivot table shape: {pv_table_df2.shape}")
                      
 
@@ -371,7 +372,7 @@ if df1 is not None:
             merged_df = pd.merge(left= df1_subset, right= df2_subset, left_on= merge_col_df1, right_on= merge_col_df2, how= how,suffixes=('_fl1', '_fl2'),indicator=True)
             st.success(f"Successfully merged!Resulting shape{merged_df.shape}")
             num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "merged_df" )                    
-            st.dataframe(merged_df.head(num_rows))
+            safe_dataframe(merged_df.head(num_rows))
 
             both_files = merged_df[merged_df["_merge"] == "both"]
             left_only = merged_df[merged_df["_merge"] == "left_only"]
@@ -380,7 +381,7 @@ if df1 is not None:
                 #Rows from all the tables
             with st.expander("Rows from both files"):
                 st.write(f"Shape:{both_files.shape}")
-                st.dataframe(both_files.head())
+                safe_dataframe(both_files.head())
             if 'both_files' in locals():
                 with st.expander("Summary of Both rows"):
                     st.write(both_files.describe(include = "all"))
@@ -423,7 +424,7 @@ if df1 is not None:
                             st.success(f"Successfully subtracted:{col1} - {col2}")
 
                         num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10 )
-                        st.dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
+                        safe_dataframe(result_df[[id_col,col1, col2, "Result"]].head(num_rows))
             
             with st.expander("Summary of the Result"):
                 st.write(result_df.describe(include="all"))
@@ -432,20 +433,20 @@ if df1 is not None:
                 between_df_files = result_df[result_df["Result"].between(-10 , 10)]
                 outside_result = result_df[~result_df["Result"].between(-10 , 10)]              
                 num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key ="preview_between" )
-                st.dataframe(between_df_files[[id_col, col1, col2,"Result"]].head(num_rows))
+                safe_dataframe(between_df_files[[id_col, col1, col2,"Result"]].head(num_rows))
 
             
             with st.expander(f"Data from both Files that reconcilliation is greater than (-10 and 10)"):
                     num_rows = st.slider("Select number of rows to preview ", min_value = 5, max_value = 1000, value = 10,key = "preview_outside" )
-                    st.dataframe(outside_result[[id_col,col1,col2,"Result"]].head(num_rows))                
+                    safe_dataframe(outside_result[[id_col,col1,col2,"Result"]].head(num_rows))                
 
                                     #with st.expander("Preview of Result"):
-                                        #st.dataframe(result_df[[col1, col2, "Result"]].head(10))
+                                        #safe_dataframe(result_df[[col1, col2, "Result"]].head(10))
                 
                 #Rows from Left table only
             with st.expander("Rows from File 1 only"):
                 st.write(f"Shape:{left_only.shape}")
-                st.dataframe(left_only.head())
+                safe_dataframe(left_only.head())
             
             with st.expander("Summary of files from File 1"):
                     st.write(left_only.describe(include = "all"))
@@ -453,7 +454,7 @@ if df1 is not None:
                 #Rows from right Table only
             with st.expander("Rows from File 2 only"):
                 st.write(f"Shape:{right_only.shape}")
-                st.dataframe(right_only.head())
+                safe_dataframe(right_only.head())
                 
             with st.expander("Summary of files from File 2"):
                     st.write(right_only.describe(include = "all"))

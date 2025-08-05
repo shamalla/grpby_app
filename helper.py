@@ -4,6 +4,22 @@ import io
 import matplotlib.pyplot as plt
 import streamlit as st
 
+  #defining a function to help in conversion of date and numbers to string 
+def ensure_arrow_safe(df):
+    df=df.copy()
+    for col in df.columns:
+        if pd.api.types.is_object_dtype(df[col]) or \
+            pd.api.types.is_categorical_dtype(df[col]) or \
+                pd.api.types.is_datetime64_any_dtpe(df[col]):
+            df[col] = df[col].astype(str)
+    return df
+
+def safe_dataframe(df, **kwargs):
+    st.dataframe(ensure_arrow_safe(df), **kwargs)
+
+def safe_table(df, **kwargs):
+    st.table(ensure_arrow_safe(df), **kwargs)
+
 def analyze_file(df,label = "File"):
     st.subheader(f"{label} preview")
     num_rows = st.slider(f"Select number of rows to preview - {label}", min_value = 5, max_value = 100, value = 10 )
@@ -127,13 +143,13 @@ def analyze_file(df,label = "File"):
 def download_reconciliation_workbook(merged_df, both_files, result_df,between_df_files,outside_result, left_only,right_only, filename="reconciliation_results.xlsx"):
     output = io.BytesIO()
     with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
-        merged_df.to_excel(writer, index=False, sheet_name= "Merge_file1_file2")
-        both_files.to_excel(writer,index=False, sheet_name= "Files_from_both")
-        result_df.to_excel(writer, index=False, sheet_name= "Add_sub_to_reconcile")
-        between_df_files.to_excel(writer, index=False, sheet_name= "Rec_with_diff_10")
-        outside_result.to_excel(writer, index=False, sheet_name= "Rec_with_diff_greater_10")
-        left_only.to_excel(writer, index=False, sheet_name= "Files1_only")
-        right_only.to_excel(writer, index=False, sheet_name= "File2_only")
+        ensure_arrow_safe(merged_df).to_excel(writer, index=False, sheet_name= "Merge_file1_file2")
+        ensure_arrow_safe(both_files).to_excel(writer,index=False, sheet_name= "Files_from_both")
+        ensure_arrow_safe(result_df).to_excel(writer, index=False, sheet_name= "Add_sub_to_reconcile")
+        ensure_arrow_safe(between_df_files).to_excel(writer, index=False, sheet_name= "Rec_with_diff_10")
+        ensure_arrow_safe(outside_result).to_excel(writer, index=False, sheet_name= "Rec_with_diff_greater_10")
+        ensure_arrow_safe(left_only).to_excel(writer, index=False, sheet_name= "Files1_only")
+        ensure_arrow_safe(right_only).to_excel(writer, index=False, sheet_name= "File2_only")
 
     st.download_button(
         label="Download reconciliation result as Excel",
@@ -141,3 +157,7 @@ def download_reconciliation_workbook(merged_df, both_files, result_df,between_df
         file_name=filename,
         mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     )    
+
+
+
+  
