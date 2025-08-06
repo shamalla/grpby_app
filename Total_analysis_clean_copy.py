@@ -5,7 +5,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 from helper import analyze_file
 from helper import download_reconciliation_workbook
-from helper import safe_dataframe,safe_table
+from helper import safe_dataframe,safe_table,ensure_arrow_safe
 
 #Database servers
 import pyodbc #for SQL Server
