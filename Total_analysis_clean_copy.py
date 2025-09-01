@@ -16,9 +16,8 @@ import sqlite3 #for SQLite
 #A reset button that the user can press if he wants to clear his/her working and upload something else
 st.set_page_config(page_title = "Total Analytics", layout ="wide")
 if st.sidebar.button("Reset App"):
-    for key in list(st.session_state.keys()):
-        del st.session_state[key]
-        st.experimental_rerun()    
+    st.session_state.clear()
+    st.experimental_rerun()    
 
 #Making sure our dataframes is in a session state not being stored locally so that even if any button is clicked it still remains
 df1=st.session_state.get("df1",None)
